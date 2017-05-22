@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="CRMDatabaseModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Contacts">
+          <Key>
+            <PropertyRef Name="ContactId" />
+          </Key>
+          <Property Name="ContactId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FullName" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="CompanyName" Type="varchar" MaxLength="150" />
+          <Property Name="Position" Type="varchar" MaxLength="100" />
+          <Property Name="Country" Type="varchar" MaxLength="50" />
+          <Property Name="Email" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Guid" Type="uniqueidentifier" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'CRMDatabase.dbo.ContactsMailingLists' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="ContactsMailingLists">
+          <Key>
+            <PropertyRef Name="ContactID" />
+            <PropertyRef Name="MailingListID" />
+          </Key>
+          <Property Name="ContactID" Type="int" Nullable="false" />
+          <Property Name="MailingListID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="MailingLists">
+          <Key>
+            <PropertyRef Name="MailingListId" />
+          </Key>
+          <Property Name="MailingListId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MailingListName" Type="varchar" MaxLength="100" Nullable="false" />
+        </EntityType>
+        <Association Name="FK__ContactsM__Conta__276EDEB3">
+          <End Role="Contacts" Type="Self.Contacts" Multiplicity="1" />
+          <End Role="ContactsMailingLists" Type="Self.ContactsMailingLists" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Contacts">
+              <PropertyRef Name="ContactId" />
+            </Principal>
+            <Dependent Role="ContactsMailingLists">
+              <PropertyRef Name="ContactID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__ContactsM__Maili__286302EC">
+          <End Role="MailingLists" Type="Self.MailingLists" Multiplicity="1" />
+          <End Role="ContactsMailingLists" Type="Self.ContactsMailingLists" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MailingLists">
+              <PropertyRef Name="MailingListId" />
+            </Principal>
+            <Dependent Role="ContactsMailingLists">
+              <PropertyRef Name="MailingListID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="CRMDatabaseModelStoreContainer">
+          <EntitySet Name="Contacts" EntityType="Self.Contacts" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MailingLists" EntityType="Self.MailingLists" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ContactsMailingLists" EntityType="Self.ContactsMailingLists" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [ContactsMailingLists].[ContactID] AS [ContactID], 
+    [ContactsMailingLists].[MailingListID] AS [MailingListID]
+    FROM [dbo].[ContactsMailingLists] AS [ContactsMailingLists]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK__ContactsM__Conta__276EDEB3" Association="Self.FK__ContactsM__Conta__276EDEB3">
+            <End Role="Contacts" EntitySet="Contacts" />
+            <End Role="ContactsMailingLists" EntitySet="ContactsMailingLists" />
+          </AssociationSet>
+          <AssociationSet Name="FK__ContactsM__Maili__286302EC" Association="Self.FK__ContactsM__Maili__286302EC">
+            <End Role="MailingLists" EntitySet="MailingLists" />
+            <End Role="ContactsMailingLists" EntitySet="ContactsMailingLists" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="CRMDatabaseModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Contact">
+          <Key>
+            <PropertyRef Name="ContactId" />
+          </Key>
+          <Property Name="ContactId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FullName" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="CompanyName" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Position" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Country" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Guid" Type="Guid" />
+          <NavigationProperty Name="MailingLists" Relationship="Self.ContactsMailingLists" FromRole="Contacts" ToRole="MailingLists" />
+        </EntityType>
+        <EntityType Name="MailingList">
+          <Key>
+            <PropertyRef Name="MailingListId" />
+          </Key>
+          <Property Name="MailingListId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MailingListName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Contacts" Relationship="Self.ContactsMailingLists" FromRole="MailingLists" ToRole="Contacts" />
+        </EntityType>
+        <Association Name="ContactsMailingLists">
+          <End Role="Contacts" Type="Self.Contact" Multiplicity="*" />
+          <End Role="MailingLists" Type="Self.MailingList" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="CRMDatabaseEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Contacts" EntityType="Self.Contact" />
+          <EntitySet Name="MailingLists" EntityType="Self.MailingList" />
+          <AssociationSet Name="ContactsMailingLists" Association="Self.ContactsMailingLists">
+            <End Role="Contacts" EntitySet="Contacts" />
+            <End Role="MailingLists" EntitySet="MailingLists" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="CRMDatabaseModelStoreContainer" CdmEntityContainer="CRMDatabaseEntities">
+          <EntitySetMapping Name="Contacts">
+            <EntityTypeMapping TypeName="CRMDatabaseModel.Contact">
+              <MappingFragment StoreEntitySet="Contacts">
+                <ScalarProperty Name="ContactId" ColumnName="ContactId" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
+                <ScalarProperty Name="Position" ColumnName="Position" />
+                <ScalarProperty Name="Country" ColumnName="Country" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Guid" ColumnName="Guid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MailingLists">
+            <EntityTypeMapping TypeName="CRMDatabaseModel.MailingList">
+              <MappingFragment StoreEntitySet="MailingLists">
+                <ScalarProperty Name="MailingListId" ColumnName="MailingListId" />
+                <ScalarProperty Name="MailingListName" ColumnName="MailingListName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="ContactsMailingLists" TypeName="CRMDatabaseModel.ContactsMailingLists" StoreEntitySet="ContactsMailingLists">
+            <EndProperty Name="Contacts">
+              <ScalarProperty Name="ContactId" ColumnName="ContactID" />
+            </EndProperty>
+            <EndProperty Name="MailingLists">
+              <ScalarProperty Name="MailingListId" ColumnName="MailingListID" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
