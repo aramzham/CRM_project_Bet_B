@@ -26,7 +26,8 @@ namespace CRM.EntityFramework
         public string Position { get; set; }
         public string Country { get; set; }
         public string Email { get; set; }
-        public Guid? Guid { get; set; }
+        public Nullable<System.Guid> Guid { get; set; }
+        public Nullable<System.DateTime> DateInserted { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<MailingList> MailingLists { get; set; }
