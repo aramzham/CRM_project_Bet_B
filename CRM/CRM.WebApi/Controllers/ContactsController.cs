@@ -65,7 +65,7 @@ namespace CRM.WebApi.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             contact.Guid = Guid.NewGuid();
-            contact.DateInserted = DateTime.Now;
+            contact.DateInserted = DateTime.UtcNow;
 
             db.Contacts.Add(contact);
             db.SaveChanges();

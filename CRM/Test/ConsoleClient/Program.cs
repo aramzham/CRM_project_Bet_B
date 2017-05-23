@@ -17,7 +17,7 @@ namespace ConsoleClient
             var cont3 = new Contact { FullName = "Fox2000", CompanyName = "FoxKids", Position = "Picture", Country = "USA", Email = "fk@us.com" };
 
             var client = new HttpClient();
-            var response = client.PostAsync($"{currentAddress}api/Contacts", cont1, new JsonMediaTypeFormatter()).Result;
+            var response = client.PostAsync($"{currentAddress}api/Contacts", cont3, new JsonMediaTypeFormatter()).Result;
             Console.WriteLine(response.IsSuccessStatusCode
                 ? "Record/Records added successfully!"
                 : response.Content.ToString());
@@ -27,7 +27,7 @@ namespace ConsoleClient
             var data = (List<Contact>)JsonConvert.DeserializeObject(json, typeof(List<Contact>));
             foreach (var contact in data)
             {
-                Console.Write($"{contact.ContactId}. {contact.FullName} {contact.CompanyName} {contact.Position} {contact.Country} {contact.Email}\n");
+                Console.Write($"{contact.ContactId}. {contact.FullName} {contact.CompanyName} {contact.Position} {contact.Country} {contact.Email} {contact.Guid} {contact.DateInserted}\n");
             }
 
             Console.ReadKey();
