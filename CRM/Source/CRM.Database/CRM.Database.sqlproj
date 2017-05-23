@@ -8,7 +8,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{a52238d3-240a-46bc-a78c-b734b6928cb2}</ProjectGuid>
-    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql120DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
@@ -59,13 +59,16 @@
     <Folder Include="Properties" />
     <Folder Include="Security" />
     <Folder Include="Security\dbo" />
+    <Folder Include="Snapshots" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Security\dbo\Contacts.sql" />
     <Build Include="Security\dbo\MailingLists.sql" />
     <Build Include="Security\dbo\ContactsMailingLists.sql" />
+    <Build Include="templates.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CRM.Database.publish.xml" />
+    <None Include="Snapshots\CRM.Database_20170523_23-50-50.dacpac" />
   </ItemGroup>
 </Project>
