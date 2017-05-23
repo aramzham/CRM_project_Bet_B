@@ -35,6 +35,21 @@ namespace CRM.WebApi.Controllers
             return Ok(contact);
         }
 
+        // GET: api/Contacts/?start=1&numberOfRows=2&ascending=false
+        [ResponseType(typeof(Contact))]
+        public IHttpActionResult GetContact(int start, int numberOfRows, bool ascending)
+        {
+            //start should be 1-based (f.e. if you want from first record, then type 1)
+            var contacts = ascending ? db.Contacts.OrderBy(x => x.ContactId).Skip(start-1).Take(numberOfRows).ToListAsync().Result : db.Contacts.OrderByDescending(x => x.ContactId).Skip(start-1).Take(numberOfRows).ToListAsync().Result;
+
+            if (contacts == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(contacts);
+        }
+
         // PUT: api/Contacts/5
         [ResponseType(typeof(void))]
         public IHttpActionResult PutContact(int id, [FromBody]Contact contact)
