@@ -59,16 +59,13 @@
     <Folder Include="Properties" />
     <Folder Include="Security" />
     <Folder Include="Security\dbo" />
-    <Folder Include="Snapshots" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Security\dbo\Contacts.sql" />
     <Build Include="Security\dbo\MailingLists.sql" />
     <Build Include="Security\dbo\ContactsMailingLists.sql" />
-    <Build Include="templates.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CRM.Database.publish.xml" />
-    <None Include="Snapshots\CRM.Database_20170523_23-50-50.dacpac" />
   </ItemGroup>
 </Project>
