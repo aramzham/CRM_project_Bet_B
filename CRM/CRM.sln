@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRM.EntityFramework", "Sour
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleClient", "Test\ConsoleClient\ConsoleClient.csproj", "{BCFBC3FC-DF54-40B2-8EE0-6C5C404B2074}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRM.WebApi", "CRM.WebApi\CRM.WebApi.csproj", "{888097E6-DB9C-460B-B9BF-543EAA37CFFF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRM.WebApi", "..\..\..\..\Desktop\CRM_project_Bet_b\CRM\CRM.WebApi\CRM.WebApi.csproj", "{888097E6-DB9C-460B-B9BF-543EAA37CFFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
