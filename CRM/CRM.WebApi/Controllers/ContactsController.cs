@@ -26,7 +26,7 @@ namespace CRM.WebApi.Controllers
         [ResponseType(typeof(Contact))]
         public IHttpActionResult GetContact(int id)
         {
-            var contact = db.Contacts.FindAsync(id).Result;
+            var contact = db.Contacts.Find(id);
             if (contact == null)
             {
                 return NotFound();
