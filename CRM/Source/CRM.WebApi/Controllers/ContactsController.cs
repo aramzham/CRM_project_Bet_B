@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CRM.EntityFramework;
+using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
@@ -8,7 +8,6 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
-using CRM.EntityFramework;
 
 namespace CRM.WebApi.Controllers
 {
@@ -40,7 +39,7 @@ namespace CRM.WebApi.Controllers
         public IHttpActionResult GetContact(int start, int numberOfRows, bool ascending)
         {
             //start should be 1-based (f.e. if you want from first record, then type 1)
-            var contacts = ascending ? db.Contacts.OrderBy(x => x.ContactId).Skip(start-1).Take(numberOfRows).ToListAsync().Result : db.Contacts.OrderByDescending(x => x.ContactId).Skip(start-1).Take(numberOfRows).ToListAsync().Result;
+            var contacts = ascending ? db.Contacts.OrderBy(x => x.ID).Skip(start - 1).Take(numberOfRows).ToListAsync().Result : db.Contacts.OrderByDescending(x => x.ID).Skip(start - 1).Take(numberOfRows).ToListAsync().Result;
 
             if (contacts == null)
             {
@@ -56,7 +55,7 @@ namespace CRM.WebApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            if (id != contact.ContactId) return BadRequest();
+            if (id != contact.ID) return BadRequest();
 
             db.Entry(contact).State = EntityState.Modified;
 
@@ -85,7 +84,7 @@ namespace CRM.WebApi.Controllers
             db.Contacts.Add(contact);
             db.SaveChanges();
 
-            return CreatedAtRoute("DefaultApi", new { id = contact.ContactId }, contact);
+            return CreatedAtRoute("DefaultApi", new { id = contact.ID }, contact);
         }
 
         // DELETE: api/Contacts/5
@@ -112,7 +111,7 @@ namespace CRM.WebApi.Controllers
 
         private bool ContactExists(int id)
         {
-            return db.Contacts.Count(e => e.ContactId == id) > 0;
+            return db.Contacts.Count(e => e.ID == id) > 0;
         }
     }
 }

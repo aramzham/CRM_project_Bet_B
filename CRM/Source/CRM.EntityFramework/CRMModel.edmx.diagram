@@ -4,9 +4,10 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="27dc015997924b809e1041bae8804634" Name="Diagram1">
+      <Diagram DiagramId="e392e99dc42d425c96de4b423ef9c220" Name="Diagram1">
         <EntityTypeShape EntityType="CRMDatabaseModel.Contact" Width="1.5" PointX="0.75" PointY="1" IsExpanded="true" />
-        <EntityTypeShape EntityType="CRMDatabaseModel.MailingList" Width="1.5" PointX="3" PointY="1.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="CRMDatabaseModel.MailingList" Width="1.5" PointX="3" PointY="1.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="CRMDatabaseModel.Template" Width="1.5" PointX="5.875" PointY="1.5" IsExpanded="true" />
         <AssociationConnector Association="CRMDatabaseModel.ContactsMailingLists" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>

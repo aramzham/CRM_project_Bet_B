@@ -4,12 +4,12 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="CRMDatabaseModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="CRMDatabaseModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Contacts">
           <Key>
-            <PropertyRef Name="ContactId" />
+            <PropertyRef Name="ID" />
           </Key>
-          <Property Name="ContactId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="FullName" Type="varchar" MaxLength="200" Nullable="false" />
           <Property Name="CompanyName" Type="varchar" MaxLength="150" />
           <Property Name="Position" Type="varchar" MaxLength="100" />
@@ -18,8 +18,6 @@
           <Property Name="DateInserted" Type="date" />
           <Property Name="Guid" Type="uniqueidentifier" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'CRMDatabase.dbo.ContactsMailingLists' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="ContactsMailingLists">
           <Key>
             <PropertyRef Name="ContactID" />
@@ -30,33 +28,41 @@ warning 6002: The table/view 'CRMDatabase.dbo.ContactsMailingLists' does not hav
         </EntityType>
         <EntityType Name="MailingLists">
           <Key>
-            <PropertyRef Name="MailingListId" />
+            <PropertyRef Name="ID" />
           </Key>
-          <Property Name="MailingListId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="MailingListName" Type="varchar" MaxLength="100" Nullable="false" />
         </EntityType>
-        <Association Name="FK__ContactsM__Conta__2F10007B">
+        <EntityType Name="Templates">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TemplateName" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="PathToFile" Type="varchar(max)" Nullable="false" />
+        </EntityType>
+        <Association Name="FK__ContactsM__Conta__44FF419A">
           <End Role="Contacts" Type="Self.Contacts" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Role="ContactsMailingLists" Type="Self.ContactsMailingLists" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Contacts">
-              <PropertyRef Name="ContactId" />
+              <PropertyRef Name="ID" />
             </Principal>
             <Dependent Role="ContactsMailingLists">
               <PropertyRef Name="ContactID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__ContactsM__Maili__2A4B4B5E">
+        <Association Name="FK__ContactsM__Maili__45F365D3">
           <End Role="MailingLists" Type="Self.MailingLists" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Role="ContactsMailingLists" Type="Self.ContactsMailingLists" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="MailingLists">
-              <PropertyRef Name="MailingListId" />
+              <PropertyRef Name="ID" />
             </Principal>
             <Dependent Role="ContactsMailingLists">
               <PropertyRef Name="MailingListID" />
@@ -65,47 +71,52 @@ warning 6002: The table/view 'CRMDatabase.dbo.ContactsMailingLists' does not hav
         </Association>
         <EntityContainer Name="CRMDatabaseModelStoreContainer">
           <EntitySet Name="Contacts" EntityType="Self.Contacts" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ContactsMailingLists" EntityType="Self.ContactsMailingLists" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MailingLists" EntityType="Self.MailingLists" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="ContactsMailingLists" EntityType="Self.ContactsMailingLists" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [ContactsMailingLists].[ContactID] AS [ContactID], 
-    [ContactsMailingLists].[MailingListID] AS [MailingListID]
-    FROM [dbo].[ContactsMailingLists] AS [ContactsMailingLists]</DefiningQuery>
-          </EntitySet>
-          <AssociationSet Name="FK__ContactsM__Conta__2F10007B" Association="Self.FK__ContactsM__Conta__2F10007B">
+          <EntitySet Name="Templates" EntityType="Self.Templates" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__ContactsM__Conta__44FF419A" Association="Self.FK__ContactsM__Conta__44FF419A">
             <End Role="Contacts" EntitySet="Contacts" />
             <End Role="ContactsMailingLists" EntitySet="ContactsMailingLists" />
           </AssociationSet>
-          <AssociationSet Name="FK__ContactsM__Maili__2A4B4B5E" Association="Self.FK__ContactsM__Maili__2A4B4B5E">
+          <AssociationSet Name="FK__ContactsM__Maili__45F365D3" Association="Self.FK__ContactsM__Maili__45F365D3">
             <End Role="MailingLists" EntitySet="MailingLists" />
             <End Role="ContactsMailingLists" EntitySet="ContactsMailingLists" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="CRMDatabaseModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityType Name="Contact">
           <Key>
-            <PropertyRef Name="ContactId" />
+            <PropertyRef Name="ID" />
           </Key>
-          <Property Name="ContactId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="FullName" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="CompanyName" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
           <Property Name="Position" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="Country" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="DateInserted" Type="DateTime" Precision="0" />
           <Property Name="Guid" Type="Guid" />
           <NavigationProperty Name="MailingLists" Relationship="Self.ContactsMailingLists" FromRole="Contacts" ToRole="MailingLists" />
-          <Property Name="DateInserted" Type="DateTime" Precision="0" />
         </EntityType>
         <EntityType Name="MailingList">
           <Key>
-            <PropertyRef Name="MailingListId" />
+            <PropertyRef Name="ID" />
           </Key>
-          <Property Name="MailingListId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="MailingListName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
           <NavigationProperty Name="Contacts" Relationship="Self.ContactsMailingLists" FromRole="MailingLists" ToRole="Contacts" />
+        </EntityType>
+        <EntityType Name="Template">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TemplateName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="PathToFile" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
         </EntityType>
         <Association Name="ContactsMailingLists">
           <End Role="Contacts" Type="Self.Contact" Multiplicity="*" />
@@ -114,6 +125,7 @@ warning 6002: The table/view 'CRMDatabase.dbo.ContactsMailingLists' does not hav
         <EntityContainer Name="CRMDatabaseEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Contacts" EntityType="Self.Contact" />
           <EntitySet Name="MailingLists" EntityType="Self.MailingList" />
+          <EntitySet Name="Templates" EntityType="Self.Template" />
           <AssociationSet Name="ContactsMailingLists" Association="Self.ContactsMailingLists">
             <End Role="Contacts" EntitySet="Contacts" />
             <End Role="MailingLists" EntitySet="MailingLists" />
@@ -128,13 +140,13 @@ warning 6002: The table/view 'CRMDatabase.dbo.ContactsMailingLists' does not hav
           <EntitySetMapping Name="Contacts">
             <EntityTypeMapping TypeName="CRMDatabaseModel.Contact">
               <MappingFragment StoreEntitySet="Contacts">
-                <ScalarProperty Name="DateInserted" ColumnName="DateInserted" />
-                <ScalarProperty Name="ContactId" ColumnName="ContactId" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="FullName" ColumnName="FullName" />
                 <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
                 <ScalarProperty Name="Position" ColumnName="Position" />
                 <ScalarProperty Name="Country" ColumnName="Country" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="DateInserted" ColumnName="DateInserted" />
                 <ScalarProperty Name="Guid" ColumnName="Guid" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -142,17 +154,26 @@ warning 6002: The table/view 'CRMDatabase.dbo.ContactsMailingLists' does not hav
           <EntitySetMapping Name="MailingLists">
             <EntityTypeMapping TypeName="CRMDatabaseModel.MailingList">
               <MappingFragment StoreEntitySet="MailingLists">
-                <ScalarProperty Name="MailingListId" ColumnName="MailingListId" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="MailingListName" ColumnName="MailingListName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Templates">
+            <EntityTypeMapping TypeName="CRMDatabaseModel.Template">
+              <MappingFragment StoreEntitySet="Templates">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="TemplateName" ColumnName="TemplateName" />
+                <ScalarProperty Name="PathToFile" ColumnName="PathToFile" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <AssociationSetMapping Name="ContactsMailingLists" TypeName="CRMDatabaseModel.ContactsMailingLists" StoreEntitySet="ContactsMailingLists">
             <EndProperty Name="Contacts">
-              <ScalarProperty Name="ContactId" ColumnName="ContactID" />
+              <ScalarProperty Name="ID" ColumnName="ContactID" />
             </EndProperty>
             <EndProperty Name="MailingLists">
-              <ScalarProperty Name="MailingListId" ColumnName="MailingListID" />
+              <ScalarProperty Name="ID" ColumnName="MailingListID" />
             </EndProperty>
           </AssociationSetMapping>
         </EntityContainerMapping>

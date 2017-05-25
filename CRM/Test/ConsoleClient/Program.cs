@@ -1,5 +1,4 @@
-﻿using CRM.EntityFramework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Formatting;
@@ -22,17 +21,17 @@ namespace ConsoleClient
             //    ? "Record/Records added successfully!"
             //    : response.Content.ToString());
 
-            var result = client.GetAsync($"{currentAddress}api/MailingLists").Result;
-            var json = result.Content.ReadAsStringAsync().Result;
-            var data = (List<MailingList>)JsonConvert.DeserializeObject(json, typeof(List<MailingList>));
-            //foreach (var contact in data)
+            //var result = client.GetAsync($"{currentAddress}api/MailingLists").Result;
+            //var json = result.Content.ReadAsStringAsync().Result;
+            //var data = (List<MailingList>)JsonConvert.DeserializeObject(json, typeof(List<MailingList>));
+            ////foreach (var contact in data)
+            ////{
+            ////    Console.Write($"{contact.ContactId}. {contact.FullName} {contact.CompanyName} {contact.Position} {contact.Country} {contact.Email} {contact.Guid} {contact.DateInserted}\n");
+            ////}
+            //foreach (var mailingList in data)
             //{
-            //    Console.Write($"{contact.ContactId}. {contact.FullName} {contact.CompanyName} {contact.Position} {contact.Country} {contact.Email} {contact.Guid} {contact.DateInserted}\n");
+            //    Console.WriteLine($"{mailingList.MailingListId}. {mailingList.MailingListName}");
             //}
-            foreach (var mailingList in data)
-            {
-                Console.WriteLine($"{mailingList.MailingListId}. {mailingList.MailingListName}");
-            }
 
             Console.ReadKey();
         }
