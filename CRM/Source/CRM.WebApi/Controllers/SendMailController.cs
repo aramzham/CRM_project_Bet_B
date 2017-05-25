@@ -21,6 +21,7 @@ namespace CRM.WebApi.Controllers
             {
                 listOfEmails.Add(await FindEmailByGuid(guid));
             }
+            SendMailTo(listOfEmails);
             return Ok();
         }
 
