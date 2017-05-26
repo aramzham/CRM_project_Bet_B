@@ -25,7 +25,7 @@ namespace CRM.WebApi.Controllers
             msg.IsBodyHtml = true;
             var sc = new SmtpClient("smtp.gmail.com", 587);
             sc.UseDefaultCredentials = false;
-            var netCredential = new NetworkCredential("aram.j90@gmail.com", "smtp587x");
+            var netCredential = new NetworkCredential("aram.j90@gmail.com", "smtp587x");//("vanhakobyan1996@gmail.com", "Van606580!!");
             sc.Credentials = netCredential;
             sc.EnableSsl = true;
             sc.Send(msg);

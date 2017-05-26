@@ -102,6 +102,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\ApplicationManager.cs" />
     <Compile Include="Models\MyContactModel.cs" />
     <Compile Include="Models\MyMailingListModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
