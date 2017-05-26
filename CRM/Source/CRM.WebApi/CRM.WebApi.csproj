@@ -103,6 +103,10 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\ApplicationManager.cs" />
+    <Compile Include="Infrastructure\MailManager.cs" />
+    <Compile Include="Infrastructure\ModelFactory.cs" />
+    <Compile Include="Models\ContactRequestModel.cs" />
+    <Compile Include="Models\ContactResponseModel.cs" />
     <Compile Include="Models\MyContactModel.cs" />
     <Compile Include="Models\MyMailingListModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
