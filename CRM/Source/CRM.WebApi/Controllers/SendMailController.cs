@@ -14,15 +14,9 @@ namespace CRM.WebApi.Controllers
     public class SendMailController : ApiController
     {
         // POST: api/SendMail
-        public async Task<IHttpActionResult> Post([FromBody] Guid[] guids)
+        public async Task<IHttpActionResult> Post([FromBody] string[] guids)
         {
-            var listOfEmails= new List<string>();
-            foreach (var guid in guids)
-            {
-                listOfEmails.Add(await FindEmailByGuid(guid));
-            }
-            SendMailTo(listOfEmails);
-            return Ok();
+            return await SendEmailByGuids(guids);
         }
 
         private void SendMailTo(List<string> emailAddresses)
@@ -31,18 +25,29 @@ namespace CRM.WebApi.Controllers
             msg.IsBodyHtml = true;
             var sc = new SmtpClient("smtp.gmail.com", 587);
             sc.UseDefaultCredentials = false;
-            var netCredential = new NetworkCredential("aram.j90@gmail.com", "krlovice");
+            var netCredential = new NetworkCredential("aram.j90@gmail.com", "smtp587x");
             sc.Credentials = netCredential;
             sc.EnableSsl = true;
             sc.Send(msg);
         }
 
-        private async Task<string> FindEmailByGuid(Guid guid)
+        private async Task<IHttpActionResult> SendEmailByGuids(string[] guids)
         {
+            var emails = new List<string>();
+            Contact contact;
             using (var db = new CRMDatabaseEntities())
             {
-                var contact = await db.Contacts.FirstOrDefaultAsync(x => x.Guid == guid);
-                return contact.Email;
+                foreach (var guid in guids)
+                {
+                    contact = await db.Contacts.Where(x => x.Guid.ToString() == guid).FirstOrDefaultAsync();
+                    if (contact != null) emails.Add(contact.Email); 
+                }
+            }
+            if (emails.Count == 0) return BadRequest("No emails were found");
+            else
+            {
+                SendMailTo(emails);
+                return Ok();
             }
         }
     }
