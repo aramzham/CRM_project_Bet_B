@@ -8,7 +8,7 @@ namespace ConsoleClient
 {
     class Program
     {
-        private static string currentAddress = @"http://localhost:56416/";
+        //private static string currentAddress = @"http://localhost:56416/";
         static void Main(string[] args)
         {
             //var cont1 = new Contact { FullName = "Arsen Grigoryan", CompanyName = "Mshakuyti naxararutyun", Position = "Texakal", Country = "Armenia", Email = "agrig@freenet.am" };

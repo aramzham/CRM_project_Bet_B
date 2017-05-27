@@ -1,8 +1,6 @@
 ﻿using CRM.EntityFramework;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -29,23 +27,17 @@ namespace CRM.WebApi.Controllers
         public async Task<IHttpActionResult> GetContact(int id)
         {
             var contact = await appManager.GetContactById(id);
-            if (contact == null)
-            {
-                return NotFound();
-            }
+            if (contact == null) return NotFound();
 
             return Ok(contact);
         }
 
-        // GET: api/Contacts/guid
-        [ResponseType(typeof (ContactResponseModel))]
+        // GET: api/Contacts?Guid=guid
+        [ResponseType(typeof(ContactResponseModel))]
         public async Task<IHttpActionResult> GetContactByGuid([FromUri]string guid)
         {
             var contact = await appManager.GetContactByGuid(guid);
-            if (contact == null)
-            {
-                return NotFound();
-            }
+            if (contact == null) return NotFound();
 
             return Ok(contact);
         }
@@ -57,10 +49,7 @@ namespace CRM.WebApi.Controllers
             //start should be 1-based (f.e. if you want from first record, then type 1)
             var contacts = await appManager.GetByPage(start, numberOfRows, ascending);
 
-            if (contacts == null)
-            {
-                return NotFound();
-            }
+            if (contacts == null) return NotFound();
 
             return Ok(contacts);
         }
@@ -89,22 +78,25 @@ namespace CRM.WebApi.Controllers
             else return StatusCode(HttpStatusCode.NoContent);
         }
 
+        //// POST: api/Contacts
+        //[ResponseType(typeof(Contact))]
+        //public async Task<IHttpActionResult> PostContact([FromBody]Contact contact)
+        //{
+        //    if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        //    await appManager.AddContact(contact);
+
+        //    return CreatedAtRoute("DefaultApi", new { id = contact.ID }, contact);
+        //}
+
         // POST: api/Contacts
-        [ResponseType(typeof(Contact))]
-        public async Task<IHttpActionResult> PostContact([FromBody]Contact contact)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            await appManager.AddContact(contact);
-
-            return CreatedAtRoute("DefaultApi", new { id = contact.ID }, contact);
-        }
-
-        // POST: api/Contacts
-        [ResponseType(typeof(Contact))]
+        [ResponseType(typeof(ContactRequestModel))]
         public async Task<IHttpActionResult> PostContact([FromBody]ContactRequestModel contact)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if ((await appManager.GetAllEmails()).Contains(contact.Email))
+                return BadRequest("A contact with such email already exists");
 
             await appManager.AddContact(contact);
 
