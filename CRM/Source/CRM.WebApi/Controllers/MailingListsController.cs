@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
@@ -47,7 +46,7 @@ namespace CRM.WebApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (id != mailingList.MailingListId)
+            if (id != mailingList.ID)
             {
                 return BadRequest();
             }
@@ -85,7 +84,7 @@ namespace CRM.WebApi.Controllers
             db.MailingLists.Add(mailingList);
             db.SaveChanges();
 
-            return CreatedAtRoute("DefaultApi", new { id = mailingList.MailingListId }, mailingList);
+            return CreatedAtRoute("DefaultApi", new { id = mailingList.ID }, mailingList);
         }
 
         // DELETE: api/MailingLists/5
@@ -115,7 +114,7 @@ namespace CRM.WebApi.Controllers
 
         private bool MailingListExists(int id)
         {
-            return db.MailingLists.Count(e => e.MailingListId == id) > 0;
+            return db.MailingLists.Count(e => e.ID == id) > 0;
         }
     }
 }

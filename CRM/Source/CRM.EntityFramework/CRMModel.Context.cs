@@ -27,5 +27,6 @@ namespace CRM.EntityFramework
     
         public virtual DbSet<Contact> Contacts { get; set; }
         public virtual DbSet<MailingList> MailingLists { get; set; }
+        public virtual DbSet<Template> Templates { get; set; }
     }
 }

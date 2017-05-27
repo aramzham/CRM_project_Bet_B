@@ -69,12 +69,6 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Source\CRM.EntityFramework\CRM.EntityFramework.csproj">
-      <Project>{44961B50-53F1-4B14-82AB-49FB7B4C68EF}</Project>
-      <Name>CRM.EntityFramework</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

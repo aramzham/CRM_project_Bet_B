@@ -20,7 +20,7 @@ namespace CRM.EntityFramework
             this.Contacts = new HashSet<Contact>();
         }
     
-        public int MailingListId { get; set; }
+        public int ID { get; set; }
         public string MailingListName { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

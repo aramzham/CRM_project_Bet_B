@@ -20,14 +20,14 @@ namespace CRM.EntityFramework
             this.MailingLists = new HashSet<MailingList>();
         }
     
-        public int ContactId { get; set; }
+        public int ID { get; set; }
         public string FullName { get; set; }
         public string CompanyName { get; set; }
         public string Position { get; set; }
         public string Country { get; set; }
         public string Email { get; set; }
-        public Nullable<System.Guid> Guid { get; set; }
         public Nullable<System.DateTime> DateInserted { get; set; }
+        public Nullable<System.Guid> Guid { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<MailingList> MailingLists { get; set; }
