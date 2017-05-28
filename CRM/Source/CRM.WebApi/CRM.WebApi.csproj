@@ -120,6 +120,7 @@
     <Compile Include="Models\MailingListResponseModel.cs" />
     <Compile Include="Models\QueryingRequestModel.cs" />
     <Compile Include="Models\MyMailingListModel.cs" />
+    <Compile Include="Models\TemplateResponseModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -6,27 +6,31 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using CRM.EntityFramework;
+using CRM.WebApi.Infrastructure;
+using CRM.WebApi.Models;
 
 namespace CRM.WebApi.Controllers
 {
     public class TemplatesController : ApiController
     {
-        private CRMDatabaseEntities db = new CRMDatabaseEntities();
+        //private CRMDatabaseEntities db = new CRMDatabaseEntities();
+        private ApplicationManager appManager = new ApplicationManager();
 
         // GET: api/Templates
-        public IQueryable<Template> GetTemplates()
+        public async Task<List<TemplateResponseModel>> GetTemplates()
         {
-            return db.Templates;
+            return await appManager.GetAllTemplates();
         }
 
         // GET: api/Templates/5
         [ResponseType(typeof(Template))]
-        public IHttpActionResult GetTemplate(int id)
+        public async Task<IHttpActionResult> GetTemplate(int id)
         {
-            Template template = db.Templates.Find(id);
+            var template = await appManager.GetTemplateById(id);
             if (template == null)
             {
                 return NotFound();
@@ -105,14 +109,14 @@ namespace CRM.WebApi.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                appManager.Dispose();
             }
             base.Dispose(disposing);
         }
 
-        private bool TemplateExists(int id)
-        {
-            return db.Templates.Count(e => e.Id == id) > 0;
-        }
+        //private bool TemplateExists(int id)
+        //{
+        //    return db.Templates.Count(e => e.Id == id) > 0;
+        //}
     }
 }

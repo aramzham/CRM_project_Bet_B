@@ -38,6 +38,22 @@ namespace CRM.WebApi.Infrastructure
                 MailingLists = c.MailingLists.Select(x => x.MailingListName).ToList()
             };
         }
+
+        public Contact CreateContact(ContactResponseModel cresm)
+        {
+            return new Contact
+            {
+                FullName = cresm.FullName,
+                CompanyName = cresm.CompanyName,
+                Position = cresm.Position,
+                Country = cresm.Country,
+                Email = cresm.Country,
+                Guid = cresm.Guid,
+                DateInserted = cresm.DateInserted,
+                MailingLists = new List<MailingList>()
+            };
+        }
+
         public Contact CreateContact(ContactRequestModel creqm)
         {
             var contact = new Contact
@@ -86,6 +102,15 @@ namespace CRM.WebApi.Infrastructure
             {
                 MailingListName = mlrm.MailingListName,
                 Contacts = new List<Contact>()
+            };
+        }
+
+        public TemplateResponseModel CreateTemplateResponseModel(Template t)
+        {
+            return new TemplateResponseModel
+            {
+                Id = t.Id,
+                TemplateName = t.TemplateName
             };
         }
     }

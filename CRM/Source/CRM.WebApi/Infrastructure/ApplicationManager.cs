@@ -142,7 +142,7 @@ namespace CRM.WebApi.Infrastructure
             return await db.Contacts.Select(x => x.Email).ToListAsync();
         }
         #endregion
-
+        #region Mailing lists methods
         public async Task<List<MailingListResponseModel>> GetAllMailingLists()
         {
             var mailingLists = await db.MailingLists.ToListAsync();
@@ -224,6 +224,20 @@ namespace CRM.WebApi.Infrastructure
         {
             return await db.MailingLists.CountAsync(e => e.ID == id) > 0;
         }
+        #endregion
+        #region Templates methods
+        public async Task<List<TemplateResponseModel>> GetAllTemplates()
+        {
+            var templates = await db.Templates.ToListAsync();
+            return templates.Select(modelFactory.CreateTemplateResponseModel).ToList();
+        }
+
+        public async Task<TemplateResponseModel> GetTemplateById(int id)
+        {
+            var template = await db.Templates.FirstOrDefaultAsync(x => x.Id == id);
+            return template == null ? null : modelFactory.CreateTemplateResponseModel(template);
+        }
+        #endregion
         public void Dispose()
         {
             db.Dispose();
