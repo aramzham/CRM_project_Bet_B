@@ -16,7 +16,6 @@ namespace CRM.WebApi.Controllers
     public class SendMailController : ApiController
     {
         private MailManager mailManager = new MailManager();
-        private ApplicationManager appManager = new ApplicationManager();
         //private ModelFactory modelFactory = new ModelFactory();
         // POST: api/SendMail
         //public async Task<IHttpActionResult> Post([FromBody] string[] guids)
@@ -46,17 +45,10 @@ namespace CRM.WebApi.Controllers
         // POST: api/SendMail
         [Route("api/SendMail/{mailingListId}/{templateId}")]
         [HttpPost]
-        public async Task<IHttpActionResult> Post([FromUri] int mailingListId, [FromUri]int templateId)
+        public async Task<IHttpActionResult> Post(int mailingListId, int templateId)
         {
-            if (!await appManager.MailingListExists(mailingListId)) return BadRequest("No such mailing list exists");
-            var mailingList = await appManager.GetMailingListById(mailingListId);
-            var contacts = mailingList.Contacts;
-            if (contacts.Count == 0) return BadRequest("No recipients were found");
-            else
-            {
-                mailManager.SendMailToMailingList(mailingList, templateId);
-                return Ok();
-            }
+            if (!await mailManager.SendMailToMailingList(mailingListId, templateId)) return BadRequest("Either there's no such mailing list or mailing list contains no contact");
+            return Ok();
         }
     }
 }

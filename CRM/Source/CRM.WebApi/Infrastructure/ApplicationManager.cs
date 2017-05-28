@@ -90,7 +90,7 @@ namespace CRM.WebApi.Infrastructure
 
         public async Task<bool> UpdateContact(string guid, ContactRequestModel contact)
         {
-            var contactToUpdate = await GetContactByGuid(guid);
+            var contactToUpdate = await db.Contacts.FirstOrDefaultAsync(x => x.Guid.ToString() == guid);
             if (contactToUpdate != null)
             {
                 contactToUpdate.FullName = contact.FullName;
@@ -98,8 +98,8 @@ namespace CRM.WebApi.Infrastructure
                 contactToUpdate.Position = contact.Position;
                 contactToUpdate.Country = contact.Country;
                 contactToUpdate.Email = contact.Email;
+                db.Entry(contactToUpdate).State = EntityState.Modified;
             }
-            db.Entry(contactToUpdate).State = EntityState.Modified;
 
             try
             {

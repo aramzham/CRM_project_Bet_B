@@ -17,7 +17,6 @@ namespace CRM.WebApi.Infrastructure
     public class MailManager
     {
         private CRMDatabaseEntities db = new CRMDatabaseEntities();
-        private ModelFactory modelFactory = new ModelFactory();
         public void SendMailTo(List<string> emailAddresses)
         {
             var msg = new MailMessage("aram.j90@gmail.com", string.Join(",", emailAddresses), "Test", "Hi, from Bet b team!");
@@ -55,10 +54,23 @@ namespace CRM.WebApi.Infrastructure
         //    }
         //    return emails;
         //}
-        public void SendMailToMailingList(MailingListResponseModel ml, int templateId)
+        public async Task<bool> SendMailToMailingList(int mailingListId, int templateId)
         {
-            var contacts = ml.Contacts.Select(x => modelFactory.CreateContact(x)).ToList();
-            SendMailToListOfContacts(contacts, templateId);
+            try
+            {
+                if (!(await db.Templates.Select(x => x.Id).ToListAsync()).Contains(templateId)) return false;
+                var mailingList = await db.MailingLists.FirstOrDefaultAsync(x => x.ID == mailingListId);
+                if (mailingList == null) return false;
+
+                var contacts = mailingList.Contacts.ToList();
+                if (contacts.Count == 0) return false;
+                SendMailToListOfContacts(contacts, templateId);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public void SendMailToListOfContacts(List<Contact> contacts, int templateId)
@@ -71,7 +83,7 @@ namespace CRM.WebApi.Infrastructure
 
         public async void SendMailToSingleContact(Contact contact, int templateId)
         {
-            //var templateText = GetTemplateText(templateId).Result;
+            //var templateText = GetTemplate    Text(templateId).Result;
             //var messageText = ReplacePlaceholders(templateText, contact);
             //var messageText = await GetMessageText(templateId, contact);
             var messageText = GetMessageText(templateId, contact);

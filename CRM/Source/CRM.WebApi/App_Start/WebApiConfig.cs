@@ -23,6 +23,10 @@ namespace CRM.WebApi
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+            config.Routes.MapHttpRoute(
+                name: "SendMailToMailingList",
+                routeTemplate: "api/SendMail/{mailingListid}/{templateId}"
+            );
         }
     }
 }

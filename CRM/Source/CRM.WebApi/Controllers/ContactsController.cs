@@ -54,17 +54,17 @@ namespace CRM.WebApi.Controllers
             return Ok(contacts);
         }
 
-        // PUT: api/Contacts/5
-        [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutContact(int id, [FromBody]Contact contact)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+        //// PUT: api/Contacts/5
+        //[ResponseType(typeof(void))]
+        //public async Task<IHttpActionResult> PutContact(int id, [FromBody]Contact contact)
+        //{
+        //    if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            if (id != contact.ID) return BadRequest();
+        //    if (id != contact.ID) return BadRequest();
 
-            if (!await appManager.UpdateContact(id, contact)) return NotFound();
-            else return StatusCode(HttpStatusCode.NoContent);
-        }
+        //    if (!await appManager.UpdateContact(id, contact)) return NotFound();
+        //    else return StatusCode(HttpStatusCode.NoContent);
+        //}
 
         // PUT: api/Contacts/guid
         [ResponseType(typeof(void))]
@@ -72,7 +72,7 @@ namespace CRM.WebApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            if (contact.Guid == null || guid != contact.Guid.ToString()) return BadRequest();
+            //if (contact.Guid == null || guid != contact.Guid.ToString()) return BadRequest();
 
             if (!await appManager.UpdateContact(guid, contact)) return NotFound();
             else return StatusCode(HttpStatusCode.NoContent);

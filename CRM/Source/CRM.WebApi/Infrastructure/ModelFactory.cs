@@ -10,20 +10,20 @@ namespace CRM.WebApi.Infrastructure
     public class ModelFactory
     {
         private CRMDatabaseEntities db = new CRMDatabaseEntities();
-        public ContactResponseModel CreateContactResponseModel(ContactRequestModel crm)
-        {
-            return new ContactResponseModel
-            {
-                FullName = crm.FullName,
-                CompanyName = crm.CompanyName,
-                Position = crm.Position,
-                Country = crm.Country,
-                Email = crm.Email,
-                Guid = Guid.NewGuid(),
-                DateInserted = DateTime.Now,
-                MailingLists = new List<string>()
-            };
-        }
+        //public ContactResponseModel CreateContactResponseModel(ContactRequestModel crm)
+        //{
+        //    return new ContactResponseModel
+        //    {
+        //        FullName = crm.FullName,
+        //        CompanyName = crm.CompanyName,
+        //        Position = crm.Position,
+        //        Country = crm.Country,
+        //        Email = crm.Email,
+        //        Guid = Guid.NewGuid(),
+        //        DateInserted = DateTime.Now,
+        //        MailingLists = new List<string>()
+        //    };
+        //}
         public ContactResponseModel CreateContactResponseModel(Contact c)
         {
             return new ContactResponseModel
@@ -39,20 +39,20 @@ namespace CRM.WebApi.Infrastructure
             };
         }
 
-        public Contact CreateContact(ContactResponseModel cresm)
-        {
-            return new Contact
-            {
-                FullName = cresm.FullName,
-                CompanyName = cresm.CompanyName,
-                Position = cresm.Position,
-                Country = cresm.Country,
-                Email = cresm.Country,
-                Guid = cresm.Guid,
-                DateInserted = cresm.DateInserted,
-                MailingLists = new List<MailingList>()
-            };
-        }
+        //public Contact CreateContact(ContactResponseModel cresm)
+        //{
+        //    return new Contact
+        //    {
+        //        FullName = cresm.FullName,
+        //        CompanyName = cresm.CompanyName,
+        //        Position = cresm.Position,
+        //        Country = cresm.Country,
+        //        Email = cresm.Country,
+        //        Guid = cresm.Guid,
+        //        DateInserted = cresm.DateInserted,
+        //        MailingLists = new List<MailingList>()
+        //    };
+        //}
 
         public Contact CreateContact(ContactRequestModel creqm)
         {
