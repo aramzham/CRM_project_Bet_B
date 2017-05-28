@@ -26,5 +26,16 @@ namespace CRM.WebApi.Controllers
                 return Ok();
             }
         }
+        // POST: api/SendMail
+        public async Task<IHttpActionResult> Post([FromBody] string[] guids, [FromUri]int templateId)
+        {
+            var emails = await mailManager.GetMails(guids);
+            if (emails.Count == 0) return BadRequest("No emails were found");
+            else
+            {
+                mailManager.SendMailTo(emails, templateId);
+                return Ok();
+            }
+        }
     }
 }

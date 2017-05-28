@@ -35,71 +35,71 @@ namespace CRM.WebApi.Controllers
             return Ok(template);
         }
 
-        // PUT: api/Templates/5
-        [ResponseType(typeof(void))]
-        public IHttpActionResult PutTemplate(int id, Template template)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //// PUT: api/Templates/5
+        //[ResponseType(typeof(void))]
+        //public IHttpActionResult PutTemplate(int id, Template template)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            if (id != template.Id)
-            {
-                return BadRequest();
-            }
+        //    if (id != template.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            db.Entry(template).State = EntityState.Modified;
+        //    db.Entry(template).State = EntityState.Modified;
 
-            try
-            {
-                db.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TemplateExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        db.SaveChanges();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!TemplateExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return StatusCode(HttpStatusCode.NoContent);
-        }
+        //    return StatusCode(HttpStatusCode.NoContent);
+        //}
 
-        // POST: api/Templates
-        [ResponseType(typeof(Template))]
-        public IHttpActionResult PostTemplate(Template template)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //// POST: api/Templates
+        //[ResponseType(typeof(Template))]
+        //public IHttpActionResult PostTemplate(Template template)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            db.Templates.Add(template);
-            db.SaveChanges();
+        //    db.Templates.Add(template);
+        //    db.SaveChanges();
 
-            return CreatedAtRoute("DefaultApi", new { id = template.Id }, template);
-        }
+        //    return CreatedAtRoute("DefaultApi", new { id = template.Id }, template);
+        //}
 
-        // DELETE: api/Templates/5
-        [ResponseType(typeof(Template))]
-        public IHttpActionResult DeleteTemplate(int id)
-        {
-            Template template = db.Templates.Find(id);
-            if (template == null)
-            {
-                return NotFound();
-            }
+        //// DELETE: api/Templates/5
+        //[ResponseType(typeof(Template))]
+        //public IHttpActionResult DeleteTemplate(int id)
+        //{
+        //    Template template = db.Templates.Find(id);
+        //    if (template == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            db.Templates.Remove(template);
-            db.SaveChanges();
+        //    db.Templates.Remove(template);
+        //    db.SaveChanges();
 
-            return Ok(template);
-        }
+        //    return Ok(template);
+        //}
 
         protected override void Dispose(bool disposing)
         {
