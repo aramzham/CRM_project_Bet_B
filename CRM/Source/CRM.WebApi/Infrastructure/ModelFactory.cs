@@ -34,7 +34,7 @@ namespace CRM.WebApi.Infrastructure
                 Country = c.Country,
                 Email = c.Email,
                 Guid = c.Guid,
-                DateInserted = c.DateInserted,
+                //DateInserted = c.DateInserted,
                 MailingLists = c.MailingLists.Select(x => x.MailingListName).ToList()
             };
         }
@@ -64,7 +64,7 @@ namespace CRM.WebApi.Infrastructure
                 Country = creqm.Country,
                 Email = creqm.Email,
                 Guid = Guid.NewGuid(),
-                DateInserted = DateTime.Now,
+                //DateInserted = DateTime.Now,
                 MailingLists = new List<MailingList>()
             };
             //var list = new List<MailingList>();

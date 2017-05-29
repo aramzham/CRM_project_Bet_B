@@ -132,6 +132,16 @@ namespace CRM.WebApi.Infrastructure
             return modelFactory.CreateContactResponseModel(contact);
         }
 
+        public async Task<List<ContactResponseModel>> RemoveContactByGroup(string[] guids)
+        {
+            var listOfRemovedContacts = new List<ContactResponseModel>();
+            foreach (var guid in guids)
+            {
+                listOfRemovedContacts.Add(await RemoveContact(guid));
+            }
+            return listOfRemovedContacts;
+        }
+
         public async Task<bool> ContactExists(string guid)
         {
             return await db.Contacts.CountAsync(e => e.Guid.ToString() == guid) > 0;

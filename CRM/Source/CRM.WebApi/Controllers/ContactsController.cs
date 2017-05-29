@@ -121,6 +121,15 @@ namespace CRM.WebApi.Controllers
             else return Ok(contact);
         }
 
+        // DELETE: api/Contacts
+        [ResponseType(typeof(ContactResponseModel))]
+        public async Task<IHttpActionResult> DeleteContactByGroup([FromBody]string[] guids)
+        {
+            var contacts = await appManager.RemoveContactByGroup(guids);
+            if (contacts == null) return NotFound();
+            else return Ok(contacts);
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

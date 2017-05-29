@@ -29,7 +29,7 @@ namespace CRM.WebApi.Controllers
         //    }
         //}
         // POST: api/SendMail
-        [Route("api/SendMail/{templateId}")]
+        //[Route("api/SendMail/{templateId}")]
         [HttpPost]
         public async Task<IHttpActionResult> Post([FromBody] string[] guids, [FromUri]int templateId)
         {

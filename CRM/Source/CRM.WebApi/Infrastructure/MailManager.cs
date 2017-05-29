@@ -102,7 +102,8 @@ namespace CRM.WebApi.Infrastructure
         {
             //var template = await db.Templates.FindAsync(templateId);
             var template = db.Templates.Find(templateId);
-            var templateText = File.ReadAllText(template.PathToFile);
+            var path = System.Web.HttpContext.Current?.Request.MapPath(template.PathToFile);
+            var templateText = File.ReadAllText(path);
             return
                 templateText.Replace("[FullName]", contact.FullName)
                     .Replace("[CompanyName]", contact.CompanyName)
