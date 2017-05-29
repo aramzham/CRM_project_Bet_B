@@ -26,18 +26,18 @@ namespace CRM.WebApi.Controllers
             return await appManager.GetAllTemplates();
         }
 
-        // GET: api/Templates/5
-        [ResponseType(typeof(Template))]
-        public async Task<IHttpActionResult> GetTemplate(int id)
-        {
-            var template = await appManager.GetTemplateById(id);
-            if (template == null)
-            {
-                return NotFound();
-            }
+        //// GET: api/Templates/5
+        //[ResponseType(typeof(Template))]
+        //public async Task<IHttpActionResult> GetTemplate(int id)
+        //{
+        //    var template = await appManager.GetTemplateById(id);
+        //    if (template == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return Ok(template);
-        }
+        //    return Ok(template);
+        //}
 
         //// PUT: api/Templates/5
         //[ResponseType(typeof(void))]

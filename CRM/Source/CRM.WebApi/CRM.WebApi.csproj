@@ -130,7 +130,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Templates\index1.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -158,7 +157,9 @@
       <Name>CRM.EntityFramework</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Templates\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

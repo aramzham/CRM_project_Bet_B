@@ -247,6 +247,12 @@ namespace CRM.WebApi.Infrastructure
             var template = await db.Templates.FirstOrDefaultAsync(x => x.Id == id);
             return template == null ? null : modelFactory.CreateTemplateResponseModel(template);
         }
+
+        public async Task<bool> TemplateExists(int id)
+        {
+            return await db.Templates.CountAsync(e => e.Id == id) > 0;
+        }
+
         #endregion
         public void Dispose()
         {
