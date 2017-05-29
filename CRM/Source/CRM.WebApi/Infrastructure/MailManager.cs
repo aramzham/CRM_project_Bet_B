@@ -87,7 +87,7 @@ namespace CRM.WebApi.Infrastructure
             //var messageText = ReplacePlaceholders(templateText, contact);
             //var messageText = await GetMessageText(templateId, contact);
             var messageText = GetMessageText(templateId, contact);
-            var msg = new MailMessage("aram.j90@gmail.com", contact.Email, "Test", messageText);
+            var msg = new MailMessage("aram.j90@gmail.com", contact.Email, $"Test for {contact.FullName}", messageText);
             msg.IsBodyHtml = true;
             var sc = new SmtpClient("smtp.gmail.com", 587);
             sc.UseDefaultCredentials = false;
@@ -102,8 +102,9 @@ namespace CRM.WebApi.Infrastructure
         {
             //var template = await db.Templates.FindAsync(templateId);
             var template = db.Templates.Find(templateId);
-            var path = System.Web.HttpContext.Current?.Request.MapPath(template.PathToFile);
-            var templateText = File.ReadAllText(path);
+            var path = HttpContext.Current?.Request.MapPath(template?.PathToFile);
+            var templateText = File.ReadAllText(path); 
+            //var templateText = File.ReadAllText(System.AppDomain.CurrentDomain.BaseDirectory+template.PathToFile);
             return
                 templateText.Replace("[FullName]", contact.FullName)
                     .Replace("[CompanyName]", contact.CompanyName)

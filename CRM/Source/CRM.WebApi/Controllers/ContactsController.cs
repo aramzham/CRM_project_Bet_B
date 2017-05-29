@@ -22,15 +22,15 @@ namespace CRM.WebApi.Controllers
             return await appManager.GetAllContacts();
         }
 
-        // GET: api/Contacts/5
-        [ResponseType(typeof(Contact))]
-        public async Task<IHttpActionResult> GetContact(int id)
-        {
-            var contact = await appManager.GetContactById(id);
-            if (contact == null) return NotFound();
+        //// GET: api/Contacts/5
+        //[ResponseType(typeof(Contact))]
+        //public async Task<IHttpActionResult> GetContact(int id)
+        //{
+        //    var contact = await appManager.GetContactById(id);
+        //    if (contact == null) return NotFound();
 
-            return Ok(contact);
-        }
+        //    return Ok(contact);
+        //}
 
         // GET: api/Contacts?Guid=guid
         [ResponseType(typeof(ContactResponseModel))]
@@ -78,17 +78,6 @@ namespace CRM.WebApi.Controllers
             else return StatusCode(HttpStatusCode.NoContent);
         }
 
-        //// POST: api/Contacts
-        //[ResponseType(typeof(Contact))]
-        //public async Task<IHttpActionResult> PostContact([FromBody]Contact contact)
-        //{
-        //    if (!ModelState.IsValid) return BadRequest(ModelState);
-
-        //    await appManager.AddContact(contact);
-
-        //    return CreatedAtRoute("DefaultApi", new { id = contact.ID }, contact);
-        //}
-
         // POST: api/Contacts
         [ResponseType(typeof(ContactRequestModel))]
         public async Task<IHttpActionResult> PostContact([FromBody]ContactRequestModel contact)
@@ -103,14 +92,14 @@ namespace CRM.WebApi.Controllers
             return CreatedAtRoute("DefaultApi", new { id = contact.Guid }, contact); //do we need this?
         }
 
-        // DELETE: api/Contacts/5
-        [ResponseType(typeof(Contact))]
-        public async Task<IHttpActionResult> DeleteContact(int id)
-        {
-            var contact = await appManager.RemoveContact(id);
-            if (contact == null) return NotFound();
-            else return Ok(contact);
-        }
+        //// DELETE: api/Contacts/5
+        //[ResponseType(typeof(Contact))]
+        //public async Task<IHttpActionResult> DeleteContact(int id)
+        //{
+        //    var contact = await appManager.RemoveContact(id);
+        //    if (contact == null) return NotFound();
+        //    else return Ok(contact);
+        //}
 
         // DELETE: api/Contacts/guid
         [ResponseType(typeof(ContactResponseModel))]

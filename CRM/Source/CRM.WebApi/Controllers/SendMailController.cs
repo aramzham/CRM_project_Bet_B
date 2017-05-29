@@ -16,23 +16,10 @@ namespace CRM.WebApi.Controllers
     public class SendMailController : ApiController
     {
         private MailManager mailManager = new MailManager();
-        //private ModelFactory modelFactory = new ModelFactory();
-        // POST: api/SendMail
-        //public async Task<IHttpActionResult> Post([FromBody] string[] guids)
-        //{
-        //    var emails = await mailManager.GetMails(guids);
-        //    if (emails.Count == 0) return BadRequest("No emails were found");
-        //    else
-        //    {
-        //        mailManager.SendMailTo(emails);
-        //        return Ok();
-        //    }
-        //}
-        // POST: api/SendMail
-        //[Route("api/SendMail/{templateId}")]
         [HttpPost]
         public async Task<IHttpActionResult> Post([FromBody] string[] guids, [FromUri]int templateId)
         {
+            if (guids == null || guids.Length == 0) return BadRequest("No recipients were found");
             var contacts = await mailManager.GetRecipients(guids);
             if (contacts.Count == 0) return BadRequest("No recipients were found");
             else
