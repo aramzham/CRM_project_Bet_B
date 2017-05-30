@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -12,6 +13,7 @@ using CRM.WebApi.Models;
 
 namespace CRM.WebApi.Controllers
 {
+    //TODO: rebuild the parser
     public class ContactsController : ApiController
     {
         private ApplicationManager appManager = new ApplicationManager();
@@ -84,12 +86,36 @@ namespace CRM.WebApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            if (!Regex.IsMatch(contact.Email, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase)) return BadRequest("Email of contact is not valid");
+
             if ((await appManager.GetAllEmails()).Contains(contact.Email))
                 return BadRequest("A contact with such email already exists");
 
             await appManager.AddContact(contact);
 
-            return CreatedAtRoute("DefaultApi", new { id = contact.Guid }, contact); //do we need this?
+            return CreatedAtRoute("DefaultApi", new { }, contact); //do we need this?
+        }
+
+        // POST: api/Contacts
+        [ResponseType(typeof(ContactRequestModel))]
+        [Route("api/Contacts/upload")]
+        [HttpPost]
+        public async Task<IHttpActionResult> Upload([FromBody]byte[] fileBytes)
+        {
+            try
+            {
+                var parser = new ParserManager();
+                var contacts = parser.RetrieveContactsFromFile(fileBytes);
+                foreach (var contact in contacts)
+                {
+                    await appManager.AddContact(contact);
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         //// DELETE: api/Contacts/5
@@ -115,7 +141,7 @@ namespace CRM.WebApi.Controllers
         public async Task<IHttpActionResult> DeleteContactByGroup([FromBody]string[] guids)
         {
             var contacts = await appManager.RemoveContactByGroup(guids);
-            if (contacts == null) return NotFound();
+            if (contacts == null || contacts.Any(x => x == null)) return BadRequest("One or more guids were corrupt");
             else return Ok(contacts);
         }
 

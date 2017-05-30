@@ -45,8 +45,10 @@ namespace CRM.WebApi.Controllers
         //    if (await appManager.UpdateMailingList(id, contacts)) return StatusCode(HttpStatusCode.NoContent);
         //    else return NotFound();
         //}
+
         // PUT: api/MailingLists/5
         [ResponseType(typeof(void))]
+        [Route("api/MailingLists/add/{id}")]
         public async Task<IHttpActionResult> PutMailingList(int id, [FromBody]List<string> guids)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);

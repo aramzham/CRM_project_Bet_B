@@ -78,7 +78,7 @@ namespace CRM.WebApi.Infrastructure
         #endregion
         public async Task<ContactResponseModel> GetContactByGuid(string guid)
         {
-            return modelFactory.CreateContactResponseModel(await db.Contacts.Where(x => x.Guid.ToString() == guid).FirstOrDefaultAsync());
+            return modelFactory.CreateContactResponseModel(await db.Contacts.FirstOrDefaultAsync(x => x.Guid.ToString() == guid));
         }
 
         public async Task<List<Contact>> GetByPage(int start, int numberOfRows, bool @ascending)
@@ -92,11 +92,11 @@ namespace CRM.WebApi.Infrastructure
             var contactToUpdate = await db.Contacts.FirstOrDefaultAsync(x => x.Guid.ToString() == guid);
             if (contactToUpdate != null)
             {
-                contactToUpdate.FullName = contact.FullName;
-                contactToUpdate.CompanyName = contact.CompanyName;
-                contactToUpdate.Position = contact.Position;
-                contactToUpdate.Country = contact.Country;
-                contactToUpdate.Email = contact.Email;
+                if (contact.FullName != null) contactToUpdate.FullName = contact.FullName;
+                if (contact.CompanyName != null) contactToUpdate.CompanyName = contact.CompanyName;
+                if (contact.Position != null) contactToUpdate.Position = contact.Position;
+                if (contact.Country != null) contactToUpdate.Country = contact.Country;
+                if (contact.Email != null) contactToUpdate.Email = contact.Email;
                 contactToUpdate.DateModified = DateTime.UtcNow;
                 db.Entry(contactToUpdate).State = EntityState.Modified;
             }
@@ -174,29 +174,29 @@ namespace CRM.WebApi.Infrastructure
             return mailingListToAdd;
         }
 
-        public async Task<bool> UpdateMailingList(int id, List<ContactRequestModel> contacts)
-        {
-            var mailingList = await db.MailingLists.FindAsync(id);
-            Contact contact;
-            foreach (var contactRequestModel in contacts)
-            {
-                contact = await db.Contacts.FirstOrDefaultAsync(x => x.Guid == contactRequestModel.Guid);
-                if (mailingList.Contacts.Contains(contact)) mailingList.Contacts.Remove(contact);
-                else mailingList.Contacts.Add(contact);
-            }
-            db.Entry(mailingList).State = EntityState.Modified;
+        //public async Task<bool> UpdateMailingList(int id, List<ContactRequestModel> contacts)
+        //{
+        //    var mailingList = await db.MailingLists.FindAsync(id);
+        //    Contact contact;
+        //    foreach (var contactRequestModel in contacts)
+        //    {
+        //        contact = await db.Contacts.FirstOrDefaultAsync(x => x.Guid == contactRequestModel.Guid);
+        //        if (mailingList.Contacts.Contains(contact)) mailingList.Contacts.Remove(contact);
+        //        else mailingList.Contacts.Add(contact);
+        //    }
+        //    db.Entry(mailingList).State = EntityState.Modified;
 
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await MailingListExists(id)) return false;
-                else throw;
-            }
-            return true;
-        }
+        //    try
+        //    {
+        //        await db.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!await MailingListExists(id)) return false;
+        //        else throw;
+        //    }
+        //    return true;
+        //}
         public async Task<bool> UpdateMailingList(int id, List<string> guids)
         {
             var mailingList = await db.MailingLists.FindAsync(id);
