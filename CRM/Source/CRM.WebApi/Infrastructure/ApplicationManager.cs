@@ -98,6 +98,7 @@ namespace CRM.WebApi.Infrastructure
                 contactToUpdate.Position = contact.Position;
                 contactToUpdate.Country = contact.Country;
                 contactToUpdate.Email = contact.Email;
+                //contactToUpdate.
                 db.Entry(contactToUpdate).State = EntityState.Modified;
             }
 
