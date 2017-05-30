@@ -87,7 +87,6 @@ namespace CRM.WebApi.Infrastructure
             else return await db.Contacts.OrderByDescending(x => x.ID).Skip(start - 1).Take(numberOfRows).ToListAsync();
         }
 
-
         public async Task<bool> UpdateContact(string guid, ContactRequestModel contact)
         {
             var contactToUpdate = await db.Contacts.FirstOrDefaultAsync(x => x.Guid.ToString() == guid);
@@ -98,7 +97,7 @@ namespace CRM.WebApi.Infrastructure
                 contactToUpdate.Position = contact.Position;
                 contactToUpdate.Country = contact.Country;
                 contactToUpdate.Email = contact.Email;
-                //contactToUpdate.
+                contactToUpdate.DateModified = DateTime.UtcNow;
                 db.Entry(contactToUpdate).State = EntityState.Modified;
             }
 

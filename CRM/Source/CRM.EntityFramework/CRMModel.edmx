@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="CRMDatabaseModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="CRMDatabaseModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Contacts">
           <Key>
             <PropertyRef Name="ID" />
@@ -15,8 +15,9 @@
           <Property Name="Position" Type="varchar" MaxLength="100" />
           <Property Name="Country" Type="varchar" MaxLength="50" />
           <Property Name="Email" Type="varchar" MaxLength="100" Nullable="false" />
-          <Property Name="DateInserted" Type="date" />
+          <Property Name="DateInserted" Type="datetime2" Precision="7" />
           <Property Name="Guid" Type="uniqueidentifier" />
+          <Property Name="DateModified" Type="datetime2" Precision="7" />
         </EntityType>
         <EntityType Name="ContactsMailingLists">
           <Key>
@@ -41,7 +42,7 @@
           <Property Name="TemplateName" Type="varchar" MaxLength="100" Nullable="false" />
           <Property Name="PathToFile" Type="varchar(max)" Nullable="false" />
         </EntityType>
-        <Association Name="FK__ContactsM__Conta__44FF419A">
+        <Association Name="FK__ContactsM__Conta__45F365D3">
           <End Role="Contacts" Type="Self.Contacts" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -55,7 +56,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__ContactsM__Maili__45F365D3">
+        <Association Name="FK__ContactsM__Maili__46E78A0C">
           <End Role="MailingLists" Type="Self.MailingLists" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -74,11 +75,11 @@
           <EntitySet Name="ContactsMailingLists" EntityType="Self.ContactsMailingLists" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MailingLists" EntityType="Self.MailingLists" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Templates" EntityType="Self.Templates" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK__ContactsM__Conta__44FF419A" Association="Self.FK__ContactsM__Conta__44FF419A">
+          <AssociationSet Name="FK__ContactsM__Conta__45F365D3" Association="Self.FK__ContactsM__Conta__45F365D3">
             <End Role="Contacts" EntitySet="Contacts" />
             <End Role="ContactsMailingLists" EntitySet="ContactsMailingLists" />
           </AssociationSet>
-          <AssociationSet Name="FK__ContactsM__Maili__45F365D3" Association="Self.FK__ContactsM__Maili__45F365D3">
+          <AssociationSet Name="FK__ContactsM__Maili__46E78A0C" Association="Self.FK__ContactsM__Maili__46E78A0C">
             <End Role="MailingLists" EntitySet="MailingLists" />
             <End Role="ContactsMailingLists" EntitySet="ContactsMailingLists" />
           </AssociationSet>
@@ -97,9 +98,10 @@
           <Property Name="Position" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="Country" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="DateInserted" Type="DateTime" Precision="0" />
+          <Property Name="DateInserted" Type="DateTime" Precision="7" />
           <Property Name="Guid" Type="Guid" />
           <NavigationProperty Name="MailingLists" Relationship="Self.ContactsMailingLists" FromRole="Contacts" ToRole="MailingLists" />
+          <Property Name="DateModified" Type="DateTime" Precision="7" />
         </EntityType>
         <EntityType Name="MailingList">
           <Key>
@@ -139,6 +141,7 @@
           <EntitySetMapping Name="Contacts">
             <EntityTypeMapping TypeName="CRMDatabaseModel.Contact">
               <MappingFragment StoreEntitySet="Contacts">
+                <ScalarProperty Name="DateModified" ColumnName="DateModified" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="FullName" ColumnName="FullName" />
                 <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
