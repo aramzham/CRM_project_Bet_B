@@ -20,8 +20,15 @@ namespace CRM.WebApi.Infrastructure
         #region Contacts methods
         public async Task<List<ContactResponseModel>> GetAllContacts()
         {
-            var listOfContacts = await db.Contacts.ToListAsync();
-            return listOfContacts.Select(modelFactory.CreateContactResponseModel).ToList();
+            try
+            {
+                var listOfContacts = await db.Contacts.ToListAsync();
+                return listOfContacts.Select(modelFactory.CreateContactResponseModel).ToList();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
         #region By ID methods
         public async Task<Contact> GetContactById(int id)
@@ -78,7 +85,8 @@ namespace CRM.WebApi.Infrastructure
         #endregion
         public async Task<ContactResponseModel> GetContactByGuid(string guid)
         {
-            return modelFactory.CreateContactResponseModel(await db.Contacts.FirstOrDefaultAsync(x => x.Guid.ToString() == guid));
+            var contact = await db.Contacts.FirstOrDefaultAsync(x => x.Guid.ToString() == guid);
+            return contact == null ? null : modelFactory.CreateContactResponseModel(contact);
         }
 
         public async Task<List<Contact>> GetByPage(int start, int numberOfRows, bool @ascending)
@@ -96,7 +104,11 @@ namespace CRM.WebApi.Infrastructure
                 if (contact.CompanyName != null) contactToUpdate.CompanyName = contact.CompanyName;
                 if (contact.Position != null) contactToUpdate.Position = contact.Position;
                 if (contact.Country != null) contactToUpdate.Country = contact.Country;
-                if (contact.Email != null) contactToUpdate.Email = contact.Email;
+                if (contact.Email != null)
+                {
+                    if (!(await GetAllEmails()).Contains(contact.Email)) contactToUpdate.Email = contact.Email;
+                    else return false;
+                }
                 contactToUpdate.DateModified = DateTime.UtcNow;
                 db.Entry(contactToUpdate).State = EntityState.Modified;
             }
@@ -112,19 +124,20 @@ namespace CRM.WebApi.Infrastructure
             }
             return true;
         }
-        public async Task<Contact> AddContact(ContactRequestModel requestContact)
+        public async Task<ContactResponseModel> AddContact(ContactRequestModel requestContact)
         {
             var contactToAdd = modelFactory.CreateContact(requestContact);
             db.Contacts.Add(contactToAdd);
             await db.SaveChangesAsync();
 
-            return contactToAdd;
+            return modelFactory.CreateContactResponseModel(contactToAdd);
         }
-
 
         public async Task<ContactResponseModel> RemoveContact(string guid)
         {
             var contact = await db.Contacts.Where(x => x.Guid.ToString() == guid).FirstOrDefaultAsync();
+
+            if (contact == null) return null;
 
             db.Contacts.Remove(contact);
             await db.SaveChangesAsync();

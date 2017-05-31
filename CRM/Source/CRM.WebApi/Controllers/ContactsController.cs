@@ -1,11 +1,13 @@
 ﻿using CRM.EntityFramework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
 using CRM.WebApi.Infrastructure;
@@ -14,6 +16,8 @@ using CRM.WebApi.Models;
 namespace CRM.WebApi.Controllers
 {
     //TODO: rebuild the parser
+    //TODO: IHttpActionResult poxel httpResponseMessage
+    //TODO: parseri mej stugel fullname, email null chlni, email-er@ valid linen
     public class ContactsController : ApiController
     {
         private ApplicationManager appManager = new ApplicationManager();
@@ -76,7 +80,7 @@ namespace CRM.WebApi.Controllers
 
             //if (contact.Guid == null || guid != contact.Guid.ToString()) return BadRequest();
 
-            if (!await appManager.UpdateContact(guid, contact)) return NotFound();
+            if (!await appManager.UpdateContact(guid, contact)) return BadRequest("Contact not found or specified email already exists");
             else return StatusCode(HttpStatusCode.NoContent);
         }
 
@@ -86,20 +90,18 @@ namespace CRM.WebApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            if (!Regex.IsMatch(contact.Email, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase)) return BadRequest("Email of contact is not valid");
+            if (!Regex.IsMatch(contact.Email, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase)) return BadRequest("Email address is not valid");
 
             if ((await appManager.GetAllEmails()).Contains(contact.Email))
                 return BadRequest("A contact with such email already exists");
 
-            await appManager.AddContact(contact);
+            var responseContact = await appManager.AddContact(contact);
 
-            return CreatedAtRoute("DefaultApi", new { }, contact); //do we need this?
+            return CreatedAtRoute("DefaultApi", new { }, responseContact); //shows up in location header
         }
 
-        // POST: api/Contacts
-        [ResponseType(typeof(ContactRequestModel))]
-        [Route("api/Contacts/upload")]
-        [HttpPost]
+        // POST: api/Contacts/upload
+        [ResponseType(typeof(ContactRequestModel)), Route("api/Contacts/upload"), HttpPost]
         public async Task<IHttpActionResult> Upload([FromBody]byte[] fileBytes)
         {
             try

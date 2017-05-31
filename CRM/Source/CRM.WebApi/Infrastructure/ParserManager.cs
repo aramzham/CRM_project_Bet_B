@@ -2,12 +2,10 @@
 using LinqToExcel;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
-using Row = LinqToExcel.Row;
 
 namespace CRM.WebApi.Infrastructure
 {
@@ -29,14 +27,7 @@ namespace CRM.WebApi.Infrastructure
             {
                 File.WriteAllBytes(path, bytes);
 
-                if (currentExtension == Extensions.Xlsx)
-                {
-                    contacts = RetrieveContactsFromExcel(path);
-                }
-                else
-                {
-                    contacts = RetrieveContactsFromCsv(path);
-                }
+                contacts = currentExtension == Extensions.Xlsx ? RetrieveContactsFromExcel(path) : RetrieveContactsFromCsv(path);
             }
             catch (Exception ex)
             {
@@ -51,26 +42,15 @@ namespace CRM.WebApi.Infrastructure
 
         private static List<Contact> RetrieveContactsFromExcel(string path)
         {
-            List<Contact> contacts = new List<Contact>();
-
             var excel = new ExcelQueryFactory(path);
             var sheets = excel.GetWorksheetNames();
             var contactsRows = (from c in excel.Worksheet<Row>(sheets.First())
                                 select c).ToList();
 
-            foreach (var contactRow in contactsRows)
+            return contactsRows.Select(contactRow => new Contact
             {
-                Contact contact = new Contact
-                {
-                    FullName = contactRow["FullName"],
-                    CompanyName = contactRow["CompanyName"],
-                    Position = contactRow["Position"],
-                    Country = contactRow["Country"],
-                    Email = contactRow["Email"]
-                };
-                contacts.Add(contact);
-            }
-            return contacts;
+                FullName = contactRow["FullName"], CompanyName = contactRow["CompanyName"], Position = contactRow["Position"], Country = contactRow["Country"], Email = contactRow["Email"]
+            }).ToList();
         }
 
         private static List<Contact> RetrieveContactsFromCsv(string path)
@@ -81,12 +61,14 @@ namespace CRM.WebApi.Infrastructure
             for (int i = 1; i < lines.Length; i++)
             {
                 var currentLine = lines[i].Split(',');
-                var contact = new Contact();
-                contact.FullName = currentLine[0];
-                contact.CompanyName = currentLine[1];
-                contact.Position = currentLine[2];
-                contact.Country = currentLine[3];
-                contact.Email = currentLine[4];
+                var contact = new Contact
+                {
+                    FullName = currentLine[0],
+                    CompanyName = currentLine[1],
+                    Position = currentLine[2],
+                    Country = currentLine[3],
+                    Email = currentLine[4]
+                };
                 //contact.Guid = Guid.NewGuid();
                 //contact.DateInserted = 
                 contacts.Add(contact);

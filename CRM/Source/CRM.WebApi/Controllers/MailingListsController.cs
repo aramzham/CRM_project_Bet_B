@@ -16,7 +16,6 @@ namespace CRM.WebApi.Controllers
 {
     public class MailingListsController : ApiController
     {
-        //private CRMDatabaseEntities db = new CRMDatabaseEntities();
         private ApplicationManager appManager = new ApplicationManager();
 
         // GET: api/MailingLists
