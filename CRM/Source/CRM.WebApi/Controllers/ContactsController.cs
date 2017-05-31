@@ -23,9 +23,11 @@ namespace CRM.WebApi.Controllers
         private ApplicationManager appManager = new ApplicationManager();
 
         // GET: api/Contacts
-        public async Task<List<ContactResponseModel>> GetContacts()
+        public async Task<IHttpActionResult> GetContacts()
         {
-            return await appManager.GetAllContacts();
+            var contacts = await appManager.GetAllContacts();
+            if (contacts == null) return BadRequest();
+            return Ok(contacts);
         }
 
         //// GET: api/Contacts/5

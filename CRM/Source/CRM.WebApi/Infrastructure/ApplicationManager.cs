@@ -4,6 +4,8 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -178,47 +180,25 @@ namespace CRM.WebApi.Infrastructure
             return mailingList == null ? null : modelFactory.CreateMailingListResponseModel(mailingList);
         }
 
-        public async Task<MailingList> AddMailingList(MailingListRequestModel mlrm)
+        public async Task<MailingListResponseModel> AddMailingList(string mailingListName)
         {
-            var mailingListToAdd = modelFactory.CreateMailingList(mlrm);
+            var mailingListToAdd = modelFactory.CreateMailingList(mailingListName);
             db.MailingLists.Add(mailingListToAdd);
             await db.SaveChangesAsync();
 
-            return mailingListToAdd;
+            return modelFactory.CreateMailingListResponseModel(mailingListToAdd);
         }
 
-        //public async Task<bool> UpdateMailingList(int id, List<ContactRequestModel> contacts)
-        //{
-        //    var mailingList = await db.MailingLists.FindAsync(id);
-        //    Contact contact;
-        //    foreach (var contactRequestModel in contacts)
-        //    {
-        //        contact = await db.Contacts.FirstOrDefaultAsync(x => x.Guid == contactRequestModel.Guid);
-        //        if (mailingList.Contacts.Contains(contact)) mailingList.Contacts.Remove(contact);
-        //        else mailingList.Contacts.Add(contact);
-        //    }
-        //    db.Entry(mailingList).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await db.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!await MailingListExists(id)) return false;
-        //        else throw;
-        //    }
-        //    return true;
-        //}
-        public async Task<bool> UpdateMailingList(int id, List<string> guids)
+        public async Task<bool> RemoveContactsFromMailingLists(int id, string[] guids)
         {
             var mailingList = await db.MailingLists.FindAsync(id);
+            if (mailingList == null) return false; //id is bad
             Contact contact;
             foreach (var guid in guids)
             {
                 contact = await db.Contacts.FirstOrDefaultAsync(x => x.Guid.ToString() == guid);
+                if (contact == null) return false; //guid is bad
                 if (mailingList.Contacts.Contains(contact)) mailingList.Contacts.Remove(contact);
-                else mailingList.Contacts.Add(contact);
             }
             db.Entry(mailingList).State = EntityState.Modified;
 
@@ -228,10 +208,37 @@ namespace CRM.WebApi.Infrastructure
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await MailingListExists(id)) return false;
+                if (!await MailingListExists(id)) return false; //something is bad :)
                 else throw;
             }
             return true;
+        }
+        public async Task<string> AddContactsToMailingLists(int[] ids, string[] guids)
+        {
+            foreach (var id in ids)
+            {
+                if (!await MailingListExists(id)) return "Mailing with such id doesn't exist";
+                var mailingList = await db.MailingLists.FindAsync(id);
+                Contact contact;
+                foreach (var guid in guids)
+                {
+                    contact = await db.Contacts.FirstOrDefaultAsync(x => x.Guid.ToString() == guid);
+                    if (contact == null) return "One or more guids were corrupt";
+                    if (!mailingList.Contacts.Contains(contact)) mailingList.Contacts.Add(contact);
+                }
+                db.Entry(mailingList).State = EntityState.Modified;
+
+                try
+                {
+                    await db.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!await MailingListExists(id)) return "Mailing list doesn't exist";
+                    else throw;
+                }
+            }
+            return "Success!";
         }
         public async Task<MailingListResponseModel> RemoveMailingList(int id)
         {
