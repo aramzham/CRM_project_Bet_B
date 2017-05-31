@@ -21,9 +21,11 @@ namespace CRM.WebApi.Controllers
         private ApplicationManager appManager = new ApplicationManager();
 
         // GET: api/Templates
-        public async Task<List<TemplateResponseModel>> GetTemplates()
+        public async Task<IHttpActionResult> GetTemplates()
         {
-            return await appManager.GetAllTemplates();
+            var templates = await appManager.GetAllTemplates();
+            if (templates == null) return BadRequest("Something went wrong, call me baby");
+            else return Ok(templates);
         }
 
         //// GET: api/Templates/5

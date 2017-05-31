@@ -245,9 +245,23 @@ namespace CRM.WebApi.Infrastructure
             var mailingList = await db.MailingLists.FindAsync(id);
 
             db.MailingLists.Remove(mailingList);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             return modelFactory.CreateMailingListResponseModel(mailingList);
+        }
+
+        public async Task<List<MailingListResponseModel>> RemoveSeveralMailingLists(int[] ids)
+        {
+            var distinctIds = ids.Distinct().ToArray();
+            var listOfRemovedLists = new List<MailingListResponseModel>();
+            foreach (var id in distinctIds)
+            {
+                if (!await MailingListExists(id)) return null;
+                var mailingResponseList = await RemoveMailingList(id);
+                await db.SaveChangesAsync();
+                listOfRemovedLists.Add(mailingResponseList);
+            }
+            return listOfRemovedLists;
         }
 
         public async Task<bool> MailingListExists(int id)

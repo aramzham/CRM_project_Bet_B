@@ -19,6 +19,7 @@ namespace CRM.WebApi.Controllers
         private ApplicationManager appManager = new ApplicationManager();
 
         // GET: api/MailingLists
+        [Route("api/MailingLists")]
         public async Task<IHttpActionResult> GetMailingLists()
         {
             var mailingLists = await appManager.GetAllMailingLists();
@@ -35,19 +36,7 @@ namespace CRM.WebApi.Controllers
             return Ok(mailingList);
         }
 
-        //// PUT: api/MailingLists/5
-        //[ResponseType(typeof(void))]
-        //public async Task<IHttpActionResult> PutMailingList(int id, [FromBody]List<ContactRequestModel> contacts)
-        //{
-        //    if (!ModelState.IsValid) return BadRequest(ModelState);
-
-        //    if (!await appManager.MailingListExists(id)) return BadRequest();
-
-        //    if (await appManager.UpdateMailingList(id, contacts)) return StatusCode(HttpStatusCode.NoContent);
-        //    else return NotFound();
-        //}
-
-        // PUT: api/MailingLists/5
+        // PUT: api/MailingLists/add
         [ResponseType(typeof(void)), Route("api/MailingLists/add"), HttpPut]
         public async Task<HttpResponseMessage> AddContacts([FromUri]int[] ids, [FromBody]string[] guids)
         {
@@ -60,6 +49,7 @@ namespace CRM.WebApi.Controllers
             return response == "Success!" ? Request.CreateResponse(HttpStatusCode.NoContent, response) : Request.CreateErrorResponse(HttpStatusCode.Conflict, response);
         }
 
+        //PUT: api/MailingLists/remove/{id}
         [ResponseType(typeof(void)), Route("api/MailingLists/remove"), HttpPut]
         public async Task<IHttpActionResult> PutMailingList(int id, [FromBody]string[] guids)
         {
@@ -82,25 +72,35 @@ namespace CRM.WebApi.Controllers
         }
 
         // POST: api/MailingLists
-        [ResponseType(typeof(MailingList)),Route("api/MailingLists/}"), HttpPost]
-        public async Task<IHttpActionResult> CreateMailingListFromContactsList([FromUri]string name,[FromBody]string[] guids)
+        [ResponseType(typeof(MailingList)), Route("api/MailingLists/new", Name = "CreateNewMailingList"), HttpPost]
+        public async Task<IHttpActionResult> CreateMailingListFromContactsList([FromUri]string name, [FromBody]string[] guids)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var mailingList = await appManager.AddMailingList(name);
-            await appManager.AddContactsToMailingLists(new int[] {mailingList.MailingListId}, guids);
-
-            return CreatedAtRoute("DefaultApi", new { id = mailingList.MailingListId}, mailingList);
+            var response = await appManager.AddContactsToMailingLists(new[] { mailingList.MailingListId }, guids);
+            if (response == null) return BadRequest("Something went wrong, call your sysadmin");
+            if (response != "Success!") return BadRequest(response);
+            return CreatedAtRoute("CreateNewMailingList", new { id = mailingList.MailingListId }, mailingList);
         }
 
         // DELETE: api/MailingLists/5
-        [ResponseType(typeof(MailingList))]
+        [ResponseType(typeof(MailingListResponseModel))]
         public async Task<IHttpActionResult> DeleteMailingList(int id)
         {
             if (!await appManager.MailingListExists(id)) return BadRequest();
             var mailingList = await appManager.RemoveMailingList(id);
             if (mailingList == null) return NotFound();
             return Ok(mailingList);
+        }
+
+        // DELETE: api/MailingLists
+        [ResponseType(typeof(MailingListResponseModel)), Route("api/MailingLists")]
+        public async Task<IHttpActionResult> DeleteSeveralMailingLists([FromBody]int[] ids)
+        {
+            var removedMailingLists = await appManager.RemoveSeveralMailingLists(ids);
+            if (removedMailingLists == null) return BadRequest("One or more ids were not correct");
+            return Ok(removedMailingLists);
         }
 
         protected override void Dispose(bool disposing)

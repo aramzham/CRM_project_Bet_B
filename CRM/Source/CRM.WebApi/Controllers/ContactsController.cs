@@ -30,16 +30,6 @@ namespace CRM.WebApi.Controllers
             return Ok(contacts);
         }
 
-        //// GET: api/Contacts/5
-        //[ResponseType(typeof(Contact))]
-        //public async Task<IHttpActionResult> GetContact(int id)
-        //{
-        //    var contact = await appManager.GetContactById(id);
-        //    if (contact == null) return NotFound();
-
-        //    return Ok(contact);
-        //}
-
         // GET: api/Contacts?Guid=guid
         [ResponseType(typeof(ContactResponseModel))]
         public async Task<IHttpActionResult> GetContactByGuid([FromUri]string guid)
@@ -50,32 +40,19 @@ namespace CRM.WebApi.Controllers
             return Ok(contact);
         }
 
-        // GET: api/Contacts/?start=1&numberOfRows=2&ascending=false
-        [ResponseType(typeof(Contact))]
-        public async Task<IHttpActionResult> GetContact(int start, int numberOfRows, bool ascending)
-        {
-            //start should be 1-based (f.e. if you want from first record, then type 1)
-            var contacts = await appManager.GetByPage(start, numberOfRows, ascending);
-
-            if (contacts == null) return NotFound();
-
-            return Ok(contacts);
-        }
-
-        //// PUT: api/Contacts/5
-        //[ResponseType(typeof(void))]
-        //public async Task<IHttpActionResult> PutContact(int id, [FromBody]Contact contact)
+        //// GET: api/Contacts/?start=1&numberOfRows=2&ascending=false
+        //[ResponseType(typeof(Contact))]
+        //public async Task<IHttpActionResult> GetContact(int start, int numberOfRows, bool ascending)
         //{
-        //    if (!ModelState.IsValid) return BadRequest(ModelState);
+        //    //start should be 1-based (f.e. if you want from first record, then type 1)
+        //    var contacts = await appManager.GetByPage(start, numberOfRows, ascending);
 
-        //    if (id != contact.ID) return BadRequest();
+        //    if (contacts == null) return NotFound();
 
-        //    if (!await appManager.UpdateContact(id, contact)) return NotFound();
-        //    else return StatusCode(HttpStatusCode.NoContent);
+        //    return Ok(contacts);
         //}
-
-        // PUT: api/Contacts/guid
-        [ResponseType(typeof(void))]
+        
+        [ResponseType(typeof(void))] // PUT: api/Contacts/guid
         public async Task<IHttpActionResult> PutContact(string guid, [FromBody]ContactRequestModel contact)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -121,15 +98,6 @@ namespace CRM.WebApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-        //// DELETE: api/Contacts/5
-        //[ResponseType(typeof(Contact))]
-        //public async Task<IHttpActionResult> DeleteContact(int id)
-        //{
-        //    var contact = await appManager.RemoveContact(id);
-        //    if (contact == null) return NotFound();
-        //    else return Ok(contact);
-        //}
 
         // DELETE: api/Contacts/guid
         [ResponseType(typeof(ContactResponseModel))]
