@@ -17,43 +17,7 @@ namespace CRM.WebApi.Infrastructure
     public class MailManager
     {
         private CRMDatabaseEntities db = new CRMDatabaseEntities();
-        public void SendMailTo(List<string> emailAddresses)
-        {
-            var msg = new MailMessage("aram.j90@gmail.com", string.Join(",", emailAddresses), "Test", "Hi, from Bet b team!");
-            msg.IsBodyHtml = true;
-            var sc = new SmtpClient("smtp.gmail.com", 587);
-            sc.UseDefaultCredentials = false;
-            var netCredential = new NetworkCredential("aram.j90@gmail.com", "smtp587x");//("vanhakobyan1996@gmail.com", "Van606580!!");
-            sc.Credentials = netCredential;
-            sc.EnableSsl = true;
-            sc.Send(msg);
-        }
-        public void SendMailTo(string emailAddress, int templateId)
-        {
-            var msg = new MailMessage("aram.j90@gmail.com", emailAddress, "Test", "Hi, from Bet b team!");
-            msg.IsBodyHtml = true;
-            var sc = new SmtpClient("smtp.gmail.com", 587);
-            sc.UseDefaultCredentials = false;
-            var netCredential = new NetworkCredential("aram.j90@gmail.com", "smtp587x");//("vanhakobyan1996@gmail.com", "Van606580!!");
-            sc.Credentials = netCredential;
-            sc.EnableSsl = true;
-            sc.Send(msg);
-        }
 
-        //public async Task<List<string>> GetMails(string[] guids)
-        //{
-        //    var emails = new List<string>();
-        //    Contact contact;
-        //    using (var db = new CRMDatabaseEntities())
-        //    {
-        //        foreach (var guid in guids)
-        //        {
-        //            contact = await db.Contacts.Where(x => x.Guid.ToString() == guid).FirstOrDefaultAsync();
-        //            if (contact != null) emails.Add(contact.Email);
-        //        }
-        //    }
-        //    return emails;
-        //}
         public async Task<bool> SendMailToMailingList(int mailingListId, int templateId)
         {
             try
@@ -64,7 +28,7 @@ namespace CRM.WebApi.Infrastructure
 
                 var contacts = mailingList.Contacts.ToList();
                 if (contacts.Count == 0) return false;
-                SendMailToListOfContacts(contacts, templateId);
+                await SendMailToListOfContacts(contacts, templateId);
                 return true;
             }
             catch (Exception)
@@ -73,38 +37,46 @@ namespace CRM.WebApi.Infrastructure
             }
         }
 
-        public void SendMailToListOfContacts(List<Contact> contacts, int templateId)
+        public async Task SendMailToListOfContacts(List<Contact> contacts, int templateId)
         {
             foreach (var contact in contacts)
             {
-                SendMailToSingleContact(contact, templateId);
+                await SendMailToSingleContact(contact, templateId);
             }
         }
 
-        public async void SendMailToSingleContact(Contact contact, int templateId)
+        //public async Task SendMailToSingleContact(Contact contact, int templateId)
+        //{
+        //    //var templateText = GetTemplate    Text(templateId).Result;
+        //    //var messageText = ReplacePlaceholders(templateText, contact);
+        //    //var messageText = await GetMessageText(templateId, contact);
+        //    var messageText = await GetMessageText(templateId, contact);
+        //    var msg = new MailMessage("aram.j90@gmail.com", contact.Email, $"Test for {contact.FullName}", messageText);
+        //    msg.IsBodyHtml = true;
+        //    var sc = new SmtpClient("smtp.gmail.com", 587);
+        //    sc.UseDefaultCredentials = false;
+        //    var netCredential = new NetworkCredential("aram.j90@gmail.com", "smtp587x");
+        //    sc.Credentials = netCredential;
+        //    sc.EnableSsl = true;
+        //    sc.Send(msg);
+        //}
+
+        public async Task SendMailToSingleContact(Contact contact, int templateId)
         {
-            //var templateText = GetTemplate    Text(templateId).Result;
-            //var messageText = ReplacePlaceholders(templateText, contact);
-            //var messageText = await GetMessageText(templateId, contact);
-            var messageText = GetMessageText(templateId, contact);
-            var msg = new MailMessage("aram.j90@gmail.com", contact.Email, $"Test for {contact.FullName}", messageText);
-            msg.IsBodyHtml = true;
-            var sc = new SmtpClient("smtp.gmail.com", 587);
-            sc.UseDefaultCredentials = false;
-            var netCredential = new NetworkCredential("aram.j90@gmail.com", "smtp587x");//("vanhakobyan1996@gmail.com", "Van606580!!");
-            sc.Credentials = netCredential;
-            sc.EnableSsl = true;
+            var messageText = await GetMessageText(templateId, contact);
+            var msg = new MailMessage { Body = messageText, IsBodyHtml = true, Subject = $"Test for {contact.FullName}" };
+            msg.To.Add(contact.Email);
+            var sc = new SmtpClient();
             sc.Send(msg);
         }
 
-        //private async Task<string> GetMessageText(int templateId, Contact contact)
-        private string GetMessageText(int templateId, Contact contact)
+        private async Task<string> GetMessageText(int templateId, Contact contact)
+        //private string GetMessageText(int templateId, Contact contact)
         {
-            //var template = await db.Templates.FindAsync(templateId);
-            var template = db.Templates.Find(templateId);
+            var template = await db.Templates.FindAsync(templateId);
+            //var template = db.Templates.Find(templateId);
             var path = HttpContext.Current?.Request.MapPath(template?.PathToFile);
-            var templateText = File.ReadAllText(path); 
-            //var templateText = File.ReadAllText(System.AppDomain.CurrentDomain.BaseDirectory+template.PathToFile);
+            var templateText = File.ReadAllText(path);
             return
                 templateText.Replace("[FullName]", contact.FullName)
                     .Replace("[CompanyName]", contact.CompanyName)

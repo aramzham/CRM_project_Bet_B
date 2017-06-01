@@ -12,7 +12,6 @@ using CRM.WebApi.Infrastructure;
 
 namespace CRM.WebApi.Controllers
 {
-    //TODO: send mail to mailing list
     public class SendMailController : ApiController
     {
         private MailManager mailManager = new MailManager();
@@ -30,7 +29,7 @@ namespace CRM.WebApi.Controllers
             var contacts = await mailManager.GetRecipients(guids);
             if (contacts.Count == 0) return BadRequest("No recipients were found");
 
-            mailManager.SendMailToListOfContacts(contacts, templateId);
+            await mailManager.SendMailToListOfContacts(contacts, templateId);
             return Ok();
         }
 
