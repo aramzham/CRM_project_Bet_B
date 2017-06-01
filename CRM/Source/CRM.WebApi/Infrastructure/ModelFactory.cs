@@ -9,22 +9,8 @@ namespace CRM.WebApi.Infrastructure
 {
     public class ModelFactory
     {
-        private static CRMDatabaseEntities db = new CRMDatabaseEntities();
-        public static ContactResponseModel CreateContactResponseModel(ContactRequestModel crm)
-        {
-            return new ContactResponseModel
-            {
-                FullName = crm.FullName,
-                CompanyName = crm.CompanyName,
-                Position = crm.Position,
-                Country = crm.Country,
-                Email = crm.Email,
-                Guid = Guid.NewGuid(),
-                DateInserted = DateTime.Now,
-                MailingLists = new List<string>()
-            };
-        }
-        public static ContactResponseModel CreateContactResponseModel(Contact c)
+        private CRMDatabaseEntities db = new CRMDatabaseEntities();
+        public ContactResponseModel CreateContactResponseModel(Contact c)
         {
             return new ContactResponseModel
             {
@@ -34,11 +20,11 @@ namespace CRM.WebApi.Infrastructure
                 Country = c.Country,
                 Email = c.Email,
                 Guid = c.Guid,
-                DateInserted = c.DateInserted,
                 MailingLists = c.MailingLists.Select(x => x.MailingListName).ToList()
             };
         }
-        public static Contact CreateContact(ContactRequestModel creqm)
+
+        public Contact CreateContact(ContactRequestModel creqm)
         {
             var contact = new Contact
             {
@@ -49,17 +35,36 @@ namespace CRM.WebApi.Infrastructure
                 Email = creqm.Email,
                 Guid = Guid.NewGuid(),
                 DateInserted = DateTime.Now,
+                MailingLists = new List<MailingList>()
             };
-            var list = new List<MailingList>();
-            using (db)
-            {
-                foreach (var mailingListName in creqm.MailingLists)
-                {
-                    list.AddRange(db.MailingLists.Where(mailingList => mailingList.MailingListName == mailingListName));
-                }
-            }
-            contact.MailingLists = list;
             return contact;
+        }
+
+        public MailingListResponseModel CreateMailingListResponseModel(MailingList ml)
+        {
+            return new MailingListResponseModel
+            {
+                MailingListId = ml.ID,
+                MailingListName = ml.MailingListName,
+                Contacts = ml.Contacts.Select(CreateContactResponseModel).ToList()
+            };
+        }
+        public MailingList CreateMailingList(string mailingListName)
+        {
+            return new MailingList
+            {
+                MailingListName = mailingListName,
+                Contacts = new List<Contact>()
+            };
+        }
+
+        public TemplateResponseModel CreateTemplateResponseModel(Template t)
+        {
+            return new TemplateResponseModel
+            {
+                Id = t.Id,
+                TemplateName = t.TemplateName
+            };
         }
     }
 }

@@ -4,6 +4,8 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -16,28 +18,35 @@ namespace CRM.WebApi.Infrastructure
     public class ApplicationManager : IDisposable
     {
         private CRMDatabaseEntities db = new CRMDatabaseEntities();
-
+        private ModelFactory modelFactory = new ModelFactory();
+        #region Contacts methods
         public async Task<List<ContactResponseModel>> GetAllContacts()
         {
-            return await db.Contacts.Select(x => ModelFactory.CreateContactResponseModel(x)).ToListAsync();
+            try
+            {
+                var listOfContacts = await db.Contacts.ToListAsync();
+                return listOfContacts.Select(modelFactory.CreateContactResponseModel).ToList();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
-
+        #region By ID methods
         public async Task<Contact> GetContactById(int id)
         {
             return await db.Contacts.FindAsync(id);
         }
-
-        public async Task<ContactResponseModel> GetContactByGuid([FromUri] string guid)
+        public async Task<Contact> AddContact(Contact contact)
         {
-            return ModelFactory.CreateContactResponseModel(await db.Contacts.Where(x => x.Guid.ToString() == guid).FirstOrDefaultAsync());
-        }
+            contact.Guid = Guid.NewGuid();
+            contact.DateInserted = DateTime.Now;
 
-        public async Task<List<Contact>> GetByPage(int start, int numberOfRows, bool @ascending)
-        {
-            if (ascending) return await db.Contacts.OrderBy(x => x.ID).Skip(start - 1).Take(numberOfRows).ToListAsync();
-            else return await db.Contacts.OrderByDescending(x => x.ID).Skip(start - 1).Take(numberOfRows).ToListAsync();
-        }
+            db.Contacts.Add(contact);
+            await db.SaveChangesAsync();
 
+            return contact;
+        }
         public async Task<bool> UpdateContact(int id, Contact contact)
         {
             var contactToUpdate = await db.Contacts.FindAsync(id);
@@ -62,19 +71,49 @@ namespace CRM.WebApi.Infrastructure
             }
             return true;
         }
+        public async Task<Contact> RemoveContact(int id)
+        {
+            var contact = await GetContactById(id);
+
+            db.Contacts.Remove(contact);
+            await db.SaveChangesAsync();
+
+            return contact;
+        }
+        public async Task<bool> ContactExists(int id)
+        {
+            return await db.Contacts.CountAsync(e => e.ID == id) > 0;
+        }
+        #endregion
+        public async Task<ContactResponseModel> GetContactByGuid(string guid)
+        {
+            var contact = await db.Contacts.FirstOrDefaultAsync(x => x.Guid.ToString() == guid);
+            return contact == null ? null : modelFactory.CreateContactResponseModel(contact);
+        }
+
+        public async Task<List<Contact>> GetByPage(int start, int numberOfRows, bool @ascending)
+        {
+            if (ascending) return await db.Contacts.OrderBy(x => x.ID).Skip(start - 1).Take(numberOfRows).ToListAsync();
+            else return await db.Contacts.OrderByDescending(x => x.ID).Skip(start - 1).Take(numberOfRows).ToListAsync();
+        }
 
         public async Task<bool> UpdateContact(string guid, ContactRequestModel contact)
         {
-            var contactToUpdate = await GetContactByGuid(guid);
+            var contactToUpdate = await db.Contacts.FirstOrDefaultAsync(x => x.Guid.ToString() == guid);
             if (contactToUpdate != null)
             {
-                contactToUpdate.FullName = contact.FullName;
-                contactToUpdate.CompanyName = contact.CompanyName;
-                contactToUpdate.Position = contact.Position;
-                contactToUpdate.Country = contact.Country;
-                contactToUpdate.Email = contact.Email;
+                if (contact.FullName != null) contactToUpdate.FullName = contact.FullName;
+                if (contact.CompanyName != null) contactToUpdate.CompanyName = contact.CompanyName;
+                if (contact.Position != null) contactToUpdate.Position = contact.Position;
+                if (contact.Country != null) contactToUpdate.Country = contact.Country;
+                if (contact.Email != null)
+                {
+                    if (!(await GetAllEmails()).Contains(contact.Email)) contactToUpdate.Email = contact.Email;
+                    else return false;
+                }
+                contactToUpdate.DateModified = DateTime.UtcNow;
+                db.Entry(contactToUpdate).State = EntityState.Modified;
             }
-            db.Entry(contactToUpdate).State = EntityState.Modified;
 
             try
             {
@@ -87,48 +126,35 @@ namespace CRM.WebApi.Infrastructure
             }
             return true;
         }
-        public async Task<Contact> AddContact(Contact contact)
+        public async Task<ContactResponseModel> AddContact(ContactRequestModel requestContact)
         {
-            contact.Guid = Guid.NewGuid();
-            contact.DateInserted = DateTime.Now;
-
-            db.Contacts.Add(contact);
-            await db.SaveChangesAsync();
-
-            return contact;
-        }
-        public async Task<Contact> AddContact(ContactRequestModel requestContact)
-        {
-            var contactToAdd = ModelFactory.CreateContact(requestContact);
+            var contactToAdd = modelFactory.CreateContact(requestContact);
             db.Contacts.Add(contactToAdd);
             await db.SaveChangesAsync();
 
-            return contactToAdd;
+            return modelFactory.CreateContactResponseModel(contactToAdd);
         }
 
-        public async Task<Contact> RemoveContact(int id)
-        {
-            var contact = await GetContactById(id);
-
-            db.Contacts.Remove(contact);
-            await db.SaveChangesAsync();
-
-            return contact;
-        }
-
-        public async Task<Contact> RemoveContact(string guid)
+        public async Task<ContactResponseModel> RemoveContact(string guid)
         {
             var contact = await db.Contacts.Where(x => x.Guid.ToString() == guid).FirstOrDefaultAsync();
 
+            if (contact == null) return null;
+
             db.Contacts.Remove(contact);
             await db.SaveChangesAsync();
 
-            return contact;
+            return modelFactory.CreateContactResponseModel(contact);
         }
 
-        public async Task<bool> ContactExists(int id)
+        public async Task<List<ContactResponseModel>> RemoveContactByGroup(string[] guids)
         {
-            return await db.Contacts.CountAsync(e => e.ID == id) > 0;
+            var listOfRemovedContacts = new List<ContactResponseModel>();
+            foreach (var guid in guids)
+            {
+                listOfRemovedContacts.Add(await RemoveContact(guid));
+            }
+            return listOfRemovedContacts;
         }
 
         public async Task<bool> ContactExists(string guid)
@@ -136,6 +162,132 @@ namespace CRM.WebApi.Infrastructure
             return await db.Contacts.CountAsync(e => e.Guid.ToString() == guid) > 0;
         }
 
+        public async Task<List<string>> GetAllEmails()
+        {
+            return await db.Contacts.Select(x => x.Email).ToListAsync();
+        }
+        #endregion
+        #region Mailing lists methods
+        public async Task<List<MailingListResponseModel>> GetAllMailingLists()
+        {
+            var mailingLists = await db.MailingLists.ToListAsync();
+            return mailingLists.Select(x => modelFactory.CreateMailingListResponseModel(x)).ToList();
+        }
+
+        public async Task<MailingListResponseModel> GetMailingListById(int id)
+        {
+            var mailingList = await db.MailingLists.FirstOrDefaultAsync(x => x.ID == id);
+            return mailingList == null ? null : modelFactory.CreateMailingListResponseModel(mailingList);
+        }
+
+        public async Task<MailingListResponseModel> AddMailingList(string mailingListName)
+        {
+            var mailingListToAdd = modelFactory.CreateMailingList(mailingListName);
+            db.MailingLists.Add(mailingListToAdd);
+            await db.SaveChangesAsync();
+
+            return modelFactory.CreateMailingListResponseModel(mailingListToAdd);
+        }
+
+        public async Task<bool> RemoveContactsFromMailingLists(int id, string[] guids)
+        {
+            var mailingList = await db.MailingLists.FindAsync(id);
+            if (mailingList == null) return false; //id is bad
+            Contact contact;
+            foreach (var guid in guids)
+            {
+                contact = await db.Contacts.FirstOrDefaultAsync(x => x.Guid.ToString() == guid);
+                if (contact == null) return false; //guid is bad
+                if (mailingList.Contacts.Contains(contact)) mailingList.Contacts.Remove(contact);
+            }
+            db.Entry(mailingList).State = EntityState.Modified;
+
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await MailingListExists(id)) return false; //something is bad :)
+                else throw;
+            }
+            return true;
+        }
+        public async Task<string> AddContactsToMailingLists(int[] ids, string[] guids)
+        {
+            foreach (var id in ids)
+            {
+                if (!await MailingListExists(id)) return "Mailing with such id doesn't exist";
+                var mailingList = await db.MailingLists.FindAsync(id);
+                Contact contact;
+                foreach (var guid in guids)
+                {
+                    contact = await db.Contacts.FirstOrDefaultAsync(x => x.Guid.ToString() == guid);
+                    if (contact == null) return "One or more guids were corrupt";
+                    if (!mailingList.Contacts.Contains(contact)) mailingList.Contacts.Add(contact);
+                }
+                db.Entry(mailingList).State = EntityState.Modified;
+
+                try
+                {
+                    await db.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!await MailingListExists(id)) return "Mailing list doesn't exist";
+                    else throw;
+                }
+            }
+            return "Success!";
+        }
+        public async Task<MailingListResponseModel> RemoveMailingList(int id)
+        {
+            var mailingList = await db.MailingLists.FindAsync(id);
+
+            db.MailingLists.Remove(mailingList);
+            await db.SaveChangesAsync();
+
+            return modelFactory.CreateMailingListResponseModel(mailingList);
+        }
+
+        public async Task<List<MailingListResponseModel>> RemoveSeveralMailingLists(int[] ids)
+        {
+            var distinctIds = ids.Distinct().ToArray();
+            var listOfRemovedLists = new List<MailingListResponseModel>();
+            foreach (var id in distinctIds)
+            {
+                if (!await MailingListExists(id)) return null;
+                var mailingResponseList = await RemoveMailingList(id);
+                await db.SaveChangesAsync();
+                listOfRemovedLists.Add(mailingResponseList);
+            }
+            return listOfRemovedLists;
+        }
+
+        public async Task<bool> MailingListExists(int id)
+        {
+            return await db.MailingLists.CountAsync(e => e.ID == id) > 0;
+        }
+        #endregion
+        #region Templates methods
+        public async Task<List<TemplateResponseModel>> GetAllTemplates()
+        {
+            var templates = await db.Templates.ToListAsync();
+            return templates.Select(modelFactory.CreateTemplateResponseModel).ToList();
+        }
+
+        public async Task<TemplateResponseModel> GetTemplateById(int id)
+        {
+            var template = await db.Templates.FirstOrDefaultAsync(x => x.Id == id);
+            return template == null ? null : modelFactory.CreateTemplateResponseModel(template);
+        }
+
+        public async Task<bool> TemplateExists(int id)
+        {
+            return await db.Templates.CountAsync(e => e.Id == id) > 0;
+        }
+
+        #endregion
         public void Dispose()
         {
             db.Dispose();
