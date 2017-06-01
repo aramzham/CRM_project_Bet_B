@@ -165,7 +165,7 @@
     <Compile Include="Infrastructure\ApplicationManager.cs" />
     <Compile Include="Infrastructure\MailManager.cs" />
     <Compile Include="Infrastructure\ModelFactory.cs" />
-    <Compile Include="Infrastructure\ParserManager.cs" />
+    <Compile Include="Infrastructure\ParsingManager.cs" />
     <Compile Include="Models\ContactRequestModel.cs" />
     <Compile Include="Models\ContactResponseModel.cs" />
     <Compile Include="Models\MailingListRequestModel.cs" />
@@ -181,7 +181,9 @@
       <Name>CRM.EntityFramework</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

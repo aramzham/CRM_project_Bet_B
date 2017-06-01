@@ -13,7 +13,7 @@ using CRM.WebApi.Models;
 
 namespace CRM.WebApi.Infrastructure
 {
-    //TODO: async problem!
+    //TODO: open a new gmail test mail
     public class MailManager
     {
         private CRMDatabaseEntities db = new CRMDatabaseEntities();

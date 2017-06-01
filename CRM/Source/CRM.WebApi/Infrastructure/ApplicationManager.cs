@@ -213,30 +213,27 @@ namespace CRM.WebApi.Infrastructure
             }
             return true;
         }
-        public async Task<string> AddContactsToMailingLists(int[] ids, string[] guids)
+        public async Task<string> AddContactsToMailingLists(int id, string[] guids)
         {
-            foreach (var id in ids)
+            if (!await MailingListExists(id)) return "Mailing list with such id doesn't exist";
+            var mailingList = await db.MailingLists.FindAsync(id);
+            Contact contact;
+            foreach (var guid in guids)
             {
-                if (!await MailingListExists(id)) return "Mailing with such id doesn't exist";
-                var mailingList = await db.MailingLists.FindAsync(id);
-                Contact contact;
-                foreach (var guid in guids)
-                {
-                    contact = await db.Contacts.FirstOrDefaultAsync(x => x.Guid.ToString() == guid);
-                    if (contact == null) return "One or more guids were corrupt";
-                    if (!mailingList.Contacts.Contains(contact)) mailingList.Contacts.Add(contact);
-                }
-                db.Entry(mailingList).State = EntityState.Modified;
+                contact = await db.Contacts.FirstOrDefaultAsync(x => x.Guid.ToString() == guid);
+                if (contact == null) return "One or more guids were corrupt";
+                if (!mailingList.Contacts.Contains(contact)) mailingList.Contacts.Add(contact);
+            }
+            db.Entry(mailingList).State = EntityState.Modified;
 
-                try
-                {
-                    await db.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await MailingListExists(id)) return "Mailing list doesn't exist";
-                    else throw;
-                }
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await MailingListExists(id)) return "Mailing list doesn't exist";
+                else throw;
             }
             return "Success!";
         }

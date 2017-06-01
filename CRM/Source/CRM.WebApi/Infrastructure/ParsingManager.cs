@@ -9,7 +9,7 @@ using System.Web;
 
 namespace CRM.WebApi.Infrastructure
 {
-    public class ParserManager
+    public class ParsingManager
     {
         private static readonly Dictionary<Extensions, string> ExtensionSignature = new Dictionary<Extensions, string>
         {

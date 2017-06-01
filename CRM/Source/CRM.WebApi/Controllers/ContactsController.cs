@@ -1,6 +1,7 @@
 ﻿using CRM.EntityFramework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -51,7 +52,7 @@ namespace CRM.WebApi.Controllers
 
         //    return Ok(contacts);
         //}
-        
+
         [ResponseType(typeof(void))] // PUT: api/Contacts/guid
         public async Task<IHttpActionResult> PutContact(string guid, [FromBody]ContactRequestModel contact)
         {
@@ -79,25 +80,86 @@ namespace CRM.WebApi.Controllers
             return CreatedAtRoute("DefaultApi", new { }, responseContact); //shows up in location header
         }
 
-        // POST: api/Contacts/upload
-        [ResponseType(typeof(ContactRequestModel)), Route("api/Contacts/upload"), HttpPost]
-        public async Task<IHttpActionResult> Upload([FromBody]byte[] fileBytes)
+        //// POST: api/Contacts/upload
+        //[ResponseType(typeof(ContactRequestModel)), Route("api/Contacts/upload"), HttpPost]
+        //public async Task<IHttpActionResult> Upload([FromBody]byte[] fileBytes)
+        //{
+        //    try
+        //    {
+        //        var parser = new ParsingManager();
+        //        var contacts = parser.RetrieveContactsFromFile(fileBytes);
+        //        foreach (var contact in contacts)
+        //        {
+        //            await appManager.AddContact(contact);
+        //        }
+        //        return Ok();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
+
+        [Route("api/Contacts/upload"), HttpPost]
+        public async Task<HttpResponseMessage> PostFormData()
         {
+            // Check if the request contains multipart/form-data.
+            if (!Request.Content.IsMimeMultipartContent())
+            {
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            }
+
+            string root = HttpContext.Current.Server.MapPath("~/App_Data");
+            var provider = new MultipartFormDataStreamProvider(root);
+
             try
             {
-                var parser = new ParserManager();
-                var contacts = parser.RetrieveContactsFromFile(fileBytes);
-                foreach (var contact in contacts)
+                // Read the form data.
+                await Request.Content.ReadAsMultipartAsync(provider);
+
+                // This illustrates how to get the file names.
+                var fileNames = new List<string>();
+                var contacts = new List<Contact>();
+                foreach (var file in provider.FileData)
                 {
-                    await appManager.AddContact(contact);
+                    //fileNames.Add(file.Headers.ContentDisposition.FileName.Trim('\"'));
+                    var buffer = File.ReadAllBytes(file.LocalFileName);
+                    var parser = new ParsingManager();
+                    contacts = parser.RetrieveContactsFromFile(buffer);
+                    //hash values, reject request if needed
                 }
-                return Ok();
+                return Request.CreateResponse(HttpStatusCode.OK, contacts);
             }
-            catch (Exception ex)
+            catch (System.Exception e)
             {
-                return BadRequest(ex.Message);
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
+
+        //[Route("api/Contacts/upload"), HttpPost]
+        //public HttpResponseMessage Post()
+        //{
+        //    HttpResponseMessage result = null;
+        //    var httpRequest = HttpContext.Current.Request;
+        //    if (httpRequest.Files.Count > 0)
+        //    {
+        //        var docfiles = new List<string>();
+        //        foreach (string file in httpRequest.Files)
+        //        {
+        //            var postedFile = httpRequest.Files[file];
+        //            var filePath = HttpContext.Current.Server.MapPath("~/App_Data/" + postedFile.FileName);
+        //            postedFile.SaveAs(filePath);
+
+        //            docfiles.Add(filePath);
+        //        }
+        //        result = Request.CreateResponse(HttpStatusCode.Created, docfiles);
+        //    }
+        //    else
+        //    {
+        //        result = Request.CreateResponse(HttpStatusCode.BadRequest);
+        //    }
+        //    return result;
+        //}
 
         // DELETE: api/Contacts/guid
         [ResponseType(typeof(ContactResponseModel))]

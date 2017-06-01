@@ -38,11 +38,11 @@ namespace CRM.WebApi.Controllers
 
         // PUT: api/MailingLists/add
         [ResponseType(typeof(void)), Route("api/MailingLists/add"), HttpPut]
-        public async Task<HttpResponseMessage> AddContacts([FromUri]int[] ids, [FromBody]string[] guids)
+        public async Task<HttpResponseMessage> AddContactsIntoMailingList([FromUri]int id, [FromBody]string[] guids)
         {
             if (!ModelState.IsValid) return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
 
-            var response = await appManager.AddContactsToMailingLists(ids, guids);
+            var response = await appManager.AddContactsToMailingLists(id, guids);
             if (response == null)
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError,
                     "Oops! Something went wrong, call your sysadmin");
@@ -51,7 +51,7 @@ namespace CRM.WebApi.Controllers
 
         //PUT: api/MailingLists/remove/{id}
         [ResponseType(typeof(void)), Route("api/MailingLists/remove"), HttpPut]
-        public async Task<IHttpActionResult> PutMailingList(int id, [FromBody]string[] guids)
+        public async Task<IHttpActionResult> RemoveContactsFromMailingList(int id, [FromBody]string[] guids)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -78,7 +78,7 @@ namespace CRM.WebApi.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var mailingList = await appManager.AddMailingList(name);
-            var response = await appManager.AddContactsToMailingLists(new[] { mailingList.MailingListId }, guids);
+            var response = await appManager.AddContactsToMailingLists(mailingList.MailingListId, guids);
             if (response == null) return BadRequest("Something went wrong, call your sysadmin");
             if (response != "Success!") return BadRequest(response);
             return CreatedAtRoute("CreateNewMailingList", new { id = mailingList.MailingListId }, mailingList);
