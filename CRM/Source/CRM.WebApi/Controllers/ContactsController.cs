@@ -53,7 +53,7 @@ namespace CRM.WebApi.Controllers
         //    return Ok(contacts);
         //}
 
-        [ResponseType(typeof(void))] // PUT: api/Contacts/guid
+        [ResponseType(typeof(void))] // PUT: api/Contacts?Guid=guid
         public async Task<IHttpActionResult> PutContact(string guid, [FromBody]ContactRequestModel contact)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);

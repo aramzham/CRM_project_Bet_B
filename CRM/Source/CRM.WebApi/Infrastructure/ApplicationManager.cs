@@ -106,7 +106,7 @@ namespace CRM.WebApi.Infrastructure
                 if (contact.CompanyName != null) contactToUpdate.CompanyName = contact.CompanyName;
                 if (contact.Position != null) contactToUpdate.Position = contact.Position;
                 if (contact.Country != null) contactToUpdate.Country = contact.Country;
-                if (contact.Email != null)
+                if (contact.Email != null && contactToUpdate.Email != contact.Email)
                 {
                     if (!(await GetAllEmails()).Contains(contact.Email)) contactToUpdate.Email = contact.Email;
                     else return false;
