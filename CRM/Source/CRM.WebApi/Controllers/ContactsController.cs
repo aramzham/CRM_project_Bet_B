@@ -110,9 +110,20 @@ namespace CRM.WebApi.Controllers
             {
                 // Read the form data.
                 await Request.Content.ReadAsMultipartAsync(provider);
-
+                //foreach (var file in provider.Contents)
+                //{
+                    
+                //}
                 var parser = new ParsingManager();
-                var contacts = parser.RetrieveContactsFromFile(provider.FileData.FirstOrDefault()?.LocalFileName);
+                var file = provider.Contents.FirstOrDefault();
+                var buffer = File.ReadAllBytes(provider.FileData.FirstOrDefault()?.LocalFileName);
+
+
+
+                var contacts = parser.RetrieveContactsFromFile(buffer.ToString());//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                
+
+
                 var addedContacts = await appManager.AddMultipleContacts(contacts);
                 return addedContacts == null ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data in it are corrupt") : Request.CreateResponse(HttpStatusCode.OK, addedContacts);
             }
