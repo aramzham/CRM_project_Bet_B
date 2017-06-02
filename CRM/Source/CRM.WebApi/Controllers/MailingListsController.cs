@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
+using System.Web.Http.Results;
 using CRM.EntityFramework;
 using CRM.WebApi.Infrastructure;
 using CRM.WebApi.Models;
@@ -37,50 +38,56 @@ namespace CRM.WebApi.Controllers
         }
 
         // PUT: api/MailingLists/add
-        [ResponseType(typeof(void)), Route("api/MailingLists/add"), HttpPut]
-        public async Task<HttpResponseMessage> AddContactsIntoMailingList([FromUri]int id, [FromBody]string[] guids)
+        [ResponseType(typeof(void)), Route("api/MailingLists/add/{id}"), HttpPut]
+        public async Task<HttpResponseMessage> AddContactsIntoMailingList(int id, [FromBody]string[] guids)
         {
             if (!ModelState.IsValid) return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
 
-            var response = await appManager.AddContactsToMailingLists(id, guids);
-            if (response == null)
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError,
-                    "Oops! Something went wrong, call your sysadmin");
-            return response == "Success!" ? Request.CreateResponse(HttpStatusCode.NoContent, response) : Request.CreateErrorResponse(HttpStatusCode.Conflict, response);
+            var mailingListResponseModel = await appManager.AddContactsToMailingLists(id, guids);
+            return mailingListResponseModel == null ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Input data was invalid") : Request.CreateResponse(HttpStatusCode.NoContent, mailingListResponseModel);
         }
 
         //PUT: api/MailingLists/remove/{id}
-        [ResponseType(typeof(void)), Route("api/MailingLists/remove"), HttpPut]
+        [ResponseType(typeof(MailingListResponseModel)), Route("api/MailingLists/remove/{id}"), HttpPut]
         public async Task<IHttpActionResult> RemoveContactsFromMailingList(int id, [FromBody]string[] guids)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var response = await appManager.RemoveContactsFromMailingLists(id, guids);
-            if (response == true) return Ok(StatusCode(HttpStatusCode.NoContent));
+            var mailingListResponseModel = await appManager.RemoveContactsFromMailingList(id, guids);
+            if (mailingListResponseModel != null) return Ok(mailingListResponseModel);
             else return BadRequest("Invalid input data");
         }
 
+        // PUT: api/MailingLists/rename/id
+        [ResponseType(typeof (MailingListResponseModel)), Route("api/MailingLists/rename/{id}"), HttpPut]
+        public async Task<IHttpActionResult> RenameMailingList(int id, [FromBody] string name)
+        {
+            if (string.IsNullOrEmpty(name)) return BadRequest("Please specify a valid name");
+            var mailingList = await appManager.RenameMailingList(id, name);
+            if (mailingList == null) return BadRequest("Something went wrong, invalid input data");
+            else return Ok(mailingList);
+        }
+
         // POST: api/MailingLists
-        [ResponseType(typeof(MailingList)), HttpPost]
+        [ResponseType(typeof(MailingListResponseModel)),Route("api/MailingLists", Name = "CreateEmptyMailingList"), HttpPost]
         public async Task<IHttpActionResult> CreateNewMailingList([FromUri]string mailingListName)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var mailingList = await appManager.AddMailingList(mailingListName);
 
-            return CreatedAtRoute("DefaultApi", new { id = mailingList.MailingListId }, mailingList);
+            return CreatedAtRoute("CreateEmptyMailingList", new { id = mailingList.MailingListId }, mailingList);
         }
 
         // POST: api/MailingLists
-        [ResponseType(typeof(MailingList)), Route("api/MailingLists/new", Name = "CreateNewMailingList"), HttpPost]
+        [ResponseType(typeof(MailingListResponseModel)), Route("api/MailingLists/new", Name = "CreateNewMailingList"), HttpPost]
         public async Task<IHttpActionResult> CreateMailingListFromContactsList([FromUri]string name, [FromBody]string[] guids)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var mailingList = await appManager.AddMailingList(name);
-            var response = await appManager.AddContactsToMailingLists(mailingList.MailingListId, guids);
-            if (response == null) return BadRequest("Something went wrong, call your sysadmin");
-            if (response != "Success!") return BadRequest(response);
+            var mailingListResponseModel = await appManager.AddContactsToMailingLists(mailingList.MailingListId, guids);
+            if (mailingListResponseModel == null) return BadRequest("Error: Invalid input data");
             return CreatedAtRoute("CreateNewMailingList", new { id = mailingList.MailingListId }, mailingList);
         }
 

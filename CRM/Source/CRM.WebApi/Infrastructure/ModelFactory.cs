@@ -9,7 +9,6 @@ namespace CRM.WebApi.Infrastructure
 {
     public class ModelFactory
     {
-        private CRMDatabaseEntities db = new CRMDatabaseEntities();
         public ContactResponseModel CreateContactResponseModel(Contact c)
         {
             return new ContactResponseModel

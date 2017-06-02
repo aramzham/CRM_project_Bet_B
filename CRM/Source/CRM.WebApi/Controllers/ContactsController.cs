@@ -17,7 +17,6 @@ using CRM.WebApi.Models;
 namespace CRM.WebApi.Controllers
 {
     //TODO: rebuild the parser
-    //TODO: IHttpActionResult poxel httpResponseMessage
     //TODO: parseri mej stugel fullname, email null chlni, email-er@ valid linen
     public class ContactsController : ApiController
     {
@@ -70,8 +69,6 @@ namespace CRM.WebApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            if (!Regex.IsMatch(contact.Email, @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", RegexOptions.IgnoreCase)) return BadRequest("Email address is not valid");
-
             if ((await appManager.GetAllEmails()).Contains(contact.Email))
                 return BadRequest("A contact with such email already exists");
 
@@ -104,12 +101,9 @@ namespace CRM.WebApi.Controllers
         public async Task<HttpResponseMessage> PostFormData()
         {
             // Check if the request contains multipart/form-data.
-            if (!Request.Content.IsMimeMultipartContent())
-            {
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-            }
+            if (!Request.Content.IsMimeMultipartContent()) throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
 
-            string root = HttpContext.Current.Server.MapPath("~/App_Data");
+            var root = HttpContext.Current.Server.MapPath("~/App_Data");
             var provider = new MultipartFormDataStreamProvider(root);
 
             try
@@ -117,18 +111,10 @@ namespace CRM.WebApi.Controllers
                 // Read the form data.
                 await Request.Content.ReadAsMultipartAsync(provider);
 
-                // This illustrates how to get the file names.
-                var fileNames = new List<string>();
-                var contacts = new List<Contact>();
-                foreach (var file in provider.FileData)
-                {
-                    //fileNames.Add(file.Headers.ContentDisposition.FileName.Trim('\"'));
-                    var buffer = File.ReadAllBytes(file.LocalFileName);
-                    var parser = new ParsingManager();
-                    contacts = parser.RetrieveContactsFromFile(buffer);
-                    //hash values, reject request if needed
-                }
-                return Request.CreateResponse(HttpStatusCode.OK, contacts);
+                var parser = new ParsingManager();
+                var contacts = parser.RetrieveContactsFromFile(provider.FileData.FirstOrDefault()?.LocalFileName);
+                var addedContacts = await appManager.AddMultipleContacts(contacts);
+                return addedContacts == null ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data in it are corrupt") : Request.CreateResponse(HttpStatusCode.OK, addedContacts);
             }
             catch (System.Exception e)
             {
@@ -175,7 +161,7 @@ namespace CRM.WebApi.Controllers
         public async Task<IHttpActionResult> DeleteContactByGroup([FromBody]string[] guids)
         {
             var contacts = await appManager.RemoveContactByGroup(guids);
-            if (contacts == null || contacts.Any(x => x == null)) return BadRequest("One or more guids were corrupt");
+            if (contacts == null) return BadRequest("One or more guids were corrupt");
             else return Ok(contacts);
         }
 

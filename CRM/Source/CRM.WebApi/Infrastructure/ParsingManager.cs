@@ -6,62 +6,79 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
+using CRM.WebApi.Models;
 
 namespace CRM.WebApi.Infrastructure
 {
     public class ParsingManager
     {
+        private ModelFactory modelFactory = new ModelFactory();
+
         private static readonly Dictionary<Extensions, string> ExtensionSignature = new Dictionary<Extensions, string>
         {
             {Extensions.CSV, "66-69-6C-65-2C-66-6F-72"},
             {Extensions.Xlsx, "50-4B-03-04-14-00-06-00"}
         };
 
-        public List<Contact> RetrieveContactsFromFile(byte[] bytes)
+        public List<Contact> RetrieveContactsFromFile(string path)
         {
             var contacts = new List<Contact>();
-            Extensions currentExtension = GetExtension(bytes);
-            string path = "file";
 
             try
             {
-                File.WriteAllBytes(path, bytes);
-
-                contacts = currentExtension == Extensions.Xlsx ? RetrieveContactsFromExcel(path) : RetrieveContactsFromCsv(path);
+                contacts = RetrieveContactsFromExcel(path);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(ex.Message);
+                try
+                {
+                    contacts = RetrieveContactsFromCsv(path);
+                }
+                catch (Exception)
+                {
+                    throw new FormatException("File format is not supported");
+                }
             }
             finally
             {
-                File.Delete(path);
+                try
+                {
+                    File.Delete(path);
+                }
+                catch (Exception e)
+                {
+                    throw new FileNotFoundException(e.Message);
+                }
             }
             return contacts;
         }
 
-        private static List<Contact> RetrieveContactsFromExcel(string path)
+        private List<Contact> RetrieveContactsFromExcel(string path)
         {
             var excel = new ExcelQueryFactory(path);
             var sheets = excel.GetWorksheetNames();
             var contactsRows = (from c in excel.Worksheet<Row>(sheets.First())
                                 select c).ToList();
 
-            return contactsRows.Select(contactRow => new Contact
+            return contactsRows.Select(contactRow => new ContactRequestModel
             {
-                FullName = contactRow["FullName"], CompanyName = contactRow["CompanyName"], Position = contactRow["Position"], Country = contactRow["Country"], Email = contactRow["Email"]
-            }).ToList();
+                FullName = contactRow["FullName"],
+                CompanyName = contactRow["CompanyName"],
+                Position = contactRow["Position"],
+                Country = contactRow["Country"],
+                Email = contactRow["Email"]
+            }).Select(x => modelFactory.CreateContact(x)).ToList();
         }
 
-        private static List<Contact> RetrieveContactsFromCsv(string path)
+        private List<Contact> RetrieveContactsFromCsv(string path)
         {
-            var contacts = new List<Contact>();
+            var contacts = new List<ContactRequestModel>();
             var lines = File.ReadAllLines(path);
 
             for (int i = 1; i < lines.Length; i++)
             {
                 var currentLine = lines[i].Split(',');
-                var contact = new Contact
+                var contact = new ContactRequestModel
                 {
                     FullName = currentLine[0],
                     CompanyName = currentLine[1],
@@ -69,11 +86,9 @@ namespace CRM.WebApi.Infrastructure
                     Country = currentLine[3],
                     Email = currentLine[4]
                 };
-                //contact.Guid = Guid.NewGuid();
-                //contact.DateInserted = 
                 contacts.Add(contact);
             }
-            return contacts;
+            return contacts.Select(x => modelFactory.CreateContact(x)).ToList();
         }
 
         private enum Extensions
@@ -81,7 +96,6 @@ namespace CRM.WebApi.Infrastructure
             CSV,
             Xlsx,
         }
-
 
         private static Extensions GetExtension(byte[] bytes)
         {
