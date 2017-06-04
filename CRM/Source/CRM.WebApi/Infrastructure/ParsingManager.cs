@@ -31,12 +31,11 @@ namespace CRM.WebApi.Infrastructure
         {
             var contacts = new List<Contact>();
             Extensions currentExtension = GetExtension(bytes);
-            var path = $"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\\file.{currentExtension}";
-            //var path = HttpContext.Current.Server.MapPath("~//Templates");
+            var path = HttpContext.Current?.Request.MapPath($"~//Templates//file.{currentExtension}");
 
             try
             {
-                //  if (File.Exists(path)) File.Delete(path);
+                if (File.Exists(path)) File.Delete(path);
 
                 File.WriteAllBytes(path, bytes);
 
@@ -127,22 +126,41 @@ namespace CRM.WebApi.Infrastructure
         private List<Contact> RetrieveContactsFromCsv(string path)
         {
             var contacts = new List<ContactRequestModel>();
-            var lines = File.ReadAllLines(path);
-
-            for (int i = 1; i < lines.Length; i++)
+            string[] lines;
+            try
             {
-                var currentLine = lines[i].Split(',');
-                var contact = new ContactRequestModel
+                lines = File.ReadAllLines(path);
+                if (lines.Length == 0) return null;
+
+                var columnNames = lines[0].Split(',');
+                var fullNameIndex = Array.IndexOf(columnNames, "FullName");
+                var companyNameIndex = Array.IndexOf(columnNames, "CompanyName");
+                var positionIndex = Array.IndexOf(columnNames, "Position");
+                var countryIndex = Array.IndexOf(columnNames, "Country");
+                var emailIndex = Array.IndexOf(columnNames, "Email");
+                if (new int[] { fullNameIndex, companyNameIndex, positionIndex, countryIndex, emailIndex }.Any(x => x == -1)) return null;
+
+                for (int i = 1; i < lines.Length; i++)
                 {
-                    FullName = currentLine[0],
-                    CompanyName = currentLine[1],
-                    Position = currentLine[2],
-                    Country = currentLine[3],
-                    Email = currentLine[4]
-                };
-                contacts.Add(contact);
+                    if (string.IsNullOrEmpty(lines[i])) continue;
+                    var currentLine = lines[i].Split(',');
+                    if (currentLine.Any(string.IsNullOrEmpty)) continue;
+                    var contact = new ContactRequestModel
+                    {
+                        FullName = currentLine[fullNameIndex],
+                        CompanyName = currentLine[companyNameIndex],
+                        Position = currentLine[positionIndex],
+                        Country = currentLine[countryIndex],
+                        Email = currentLine[emailIndex]
+                    };
+                    contacts.Add(contact);
+                }
+                return contacts.Select(x => modelFactory.CreateContact(x)).ToList();
             }
-            return contacts.Select(x => modelFactory.CreateContact(x)).ToList();
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         private enum Extensions

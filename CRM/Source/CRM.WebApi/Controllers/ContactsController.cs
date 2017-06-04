@@ -89,8 +89,8 @@ namespace CRM.WebApi.Controllers
 
             var root = HttpContext.Current.Server.MapPath("~//Templates"); 
             var provider = new MultipartFormDataStreamProvider(root);
-            try
-            {
+            //try
+            //{
                 // Read the form data.
                 await Request.Content.ReadAsMultipartAsync(provider);
                 //foreach (var file in provider.Contents)
@@ -101,38 +101,13 @@ namespace CRM.WebApi.Controllers
                 var buffer = File.ReadAllBytes(provider.FileData.SingleOrDefault()?.LocalFileName);
                 var contacts = parser.RetrieveContactsFromFile(buffer);
                 var addedContacts = await appManager.AddMultipleContacts(contacts);
-                return addedContacts == null ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data in it are corrupt") : Request.CreateResponse(HttpStatusCode.OK, addedContacts);
-            }
-            catch (System.Exception e)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
+                return addedContacts == null ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt") : Request.CreateResponse(HttpStatusCode.OK, addedContacts);
+            //}
+            //catch (System.Exception e)
+            //{
+            //    return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
+            //}
         }
-
-        //[Route("api/Contacts/upload"), HttpPost]
-        //public HttpResponseMessage Post()
-        //{
-        //    HttpResponseMessage result = null;
-        //    var httpRequest = HttpContext.Current.Request;
-        //    if (httpRequest.Files.Count > 0)
-        //    {
-        //        var docfiles = new List<string>();
-        //        foreach (string file in httpRequest.Files)
-        //        {
-        //            var postedFile = httpRequest.Files[file];
-        //            var filePath = HttpContext.Current.Server.MapPath("~/App_Data/" + postedFile.FileName);
-        //            postedFile.SaveAs(filePath);
-
-        //            docfiles.Add(filePath);
-        //        }
-        //        result = Request.CreateResponse(HttpStatusCode.Created, docfiles);
-        //    }
-        //    else
-        //    {
-        //        result = Request.CreateResponse(HttpStatusCode.BadRequest);
-        //    }
-        //    return result;
-        //}
 
         // DELETE: api/Contacts/guid
         [ResponseType(typeof(ContactResponseModel))]
