@@ -18,6 +18,7 @@ using NLog;
 namespace CRM.WebApi.Controllers
 {
     //TODO: parseri mej stugel fullname, email null chlni, email-er@ valid linen
+    [NotImplException]
     public class ContactsController : ApiController
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();

@@ -152,7 +152,6 @@ namespace CRM.WebApi.Infrastructure
             Xls
         }
 
-
         private Extensions GetExtension(byte[] bytes)
         {
             if (bytes.Length < 8)

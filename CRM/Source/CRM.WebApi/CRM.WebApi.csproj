@@ -158,8 +158,10 @@
     <Compile Include="Controllers\SendMailController.cs" />
     <Compile Include="Controllers\TemplatesController.cs" />
     <Compile Include="Infrastructure\ApplicationManager.cs" />
+    <Compile Include="Infrastructure\LoggerManager.cs" />
     <Compile Include="Infrastructure\MailManager.cs" />
     <Compile Include="Infrastructure\ModelFactory.cs" />
+    <Compile Include="Infrastructure\NotImplExceptionFilterAttribute.cs" />
     <Compile Include="Infrastructure\ParsingManager.cs" />
     <Compile Include="Models\ContactRequestModel.cs" />
     <Compile Include="Models\ContactResponseModel.cs" />
