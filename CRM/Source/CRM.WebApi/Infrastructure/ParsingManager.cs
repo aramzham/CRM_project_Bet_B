@@ -32,11 +32,11 @@ namespace CRM.WebApi.Infrastructure
             var contacts = new List<Contact>();
             Extensions currentExtension = GetExtension(bytes);
             var path = $"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\\file.{currentExtension}";
-            //var path = $"~/Templates/file.{currentExtension}";
+            //var path = HttpContext.Current.Server.MapPath("~//Templates");
 
             try
             {
-                if (File.Exists(path)) File.Delete(path);
+                //  if (File.Exists(path)) File.Delete(path);
 
                 File.WriteAllBytes(path, bytes);
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Web;
@@ -28,5 +29,21 @@ namespace CRM.WebApi.Infrastructure
         {
             Logger.Log(LogLevel.Fatal, ex, $"\nErr: {ex.Message}\nInner: {ex.InnerException?.Message}\n");
         }
+        //public string ReadData()
+        //{
+        //    var fileTarget = (FileTarget)LogManager.Configuration.FindTargetByName("file");
+        //    var logEventInfo = new LogEventInfo { TimeStamp = DateTime.Now };
+        //    string fileName = fileTarget.FileName.Render(logEventInfo);
+        //    if (!File.Exists(fileName))
+        //        File.Create($"{logEventInfo.TimeStamp}.log");
+        //    var data = File.ReadAllLines(fileName);
+        //    string path = System.Web.HttpContext.Current?.Request.MapPath("~//Templates//log.html");
+        //    var html = File.ReadAllText(path);
+        //    string res = "";
+        //    foreach (string s in data)
+        //        res += s + "</br>";
+        //    var t = html.Replace("{data}", res).Replace("{filename}", fileName);
+        //    return t;
+        //}
     }
 }

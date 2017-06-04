@@ -87,9 +87,8 @@ namespace CRM.WebApi.Controllers
             // Check if the request contains multipart/form-data.
             if (!Request.Content.IsMimeMultipartContent()) throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
 
-            var root = HttpContext.Current.Server.MapPath("~/Templates");
+            var root = HttpContext.Current.Server.MapPath("~//Templates"); 
             var provider = new MultipartFormDataStreamProvider(root);
-
             try
             {
                 // Read the form data.
@@ -99,14 +98,14 @@ namespace CRM.WebApi.Controllers
 
                 //}
                 var parser = new ParsingManager();
-                var buffer = File.ReadAllBytes(provider.FileData.FirstOrDefault()?.LocalFileName);
+                var buffer = File.ReadAllBytes(provider.FileData.SingleOrDefault()?.LocalFileName);
                 var contacts = parser.RetrieveContactsFromFile(buffer);
                 var addedContacts = await appManager.AddMultipleContacts(contacts);
                 return addedContacts == null ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data in it are corrupt") : Request.CreateResponse(HttpStatusCode.OK, addedContacts);
             }
             catch (System.Exception e)
             {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
 
