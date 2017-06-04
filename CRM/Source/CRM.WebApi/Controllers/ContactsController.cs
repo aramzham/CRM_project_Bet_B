@@ -13,13 +13,15 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using CRM.WebApi.Infrastructure;
 using CRM.WebApi.Models;
+using NLog;
 
 namespace CRM.WebApi.Controllers
 {
-    //TODO: rebuild the parser
     //TODO: parseri mej stugel fullname, email null chlni, email-er@ valid linen
     public class ContactsController : ApiController
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private ApplicationManager appManager = new ApplicationManager();
 
         // GET: api/Contacts
@@ -77,33 +79,14 @@ namespace CRM.WebApi.Controllers
             return CreatedAtRoute("DefaultApi", new { }, responseContact); //shows up in location header
         }
 
-        //// POST: api/Contacts/upload
-        //[ResponseType(typeof(ContactRequestModel)), Route("api/Contacts/upload"), HttpPost]
-        //public async Task<IHttpActionResult> Upload([FromBody]byte[] fileBytes)
-        //{
-        //    try
-        //    {
-        //        var parser = new ParsingManager();
-        //        var contacts = parser.RetrieveContactsFromFile(fileBytes);
-        //        foreach (var contact in contacts)
-        //        {
-        //            await appManager.AddContact(contact);
-        //        }
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
-
+        //POST: api/Contacts/upload
         [Route("api/Contacts/upload"), HttpPost]
         public async Task<HttpResponseMessage> PostFormData()
         {
             // Check if the request contains multipart/form-data.
             if (!Request.Content.IsMimeMultipartContent()) throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
 
-            var root = HttpContext.Current.Server.MapPath("~/App_Data");
+            var root = HttpContext.Current.Server.MapPath("~/Templates");
             var provider = new MultipartFormDataStreamProvider(root);
 
             try
@@ -112,18 +95,11 @@ namespace CRM.WebApi.Controllers
                 await Request.Content.ReadAsMultipartAsync(provider);
                 //foreach (var file in provider.Contents)
                 //{
-                    
+
                 //}
                 var parser = new ParsingManager();
-                var file = provider.Contents.FirstOrDefault();
                 var buffer = File.ReadAllBytes(provider.FileData.FirstOrDefault()?.LocalFileName);
-
-
-
-                var contacts = parser.RetrieveContactsFromFile(buffer.ToString());//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                
-
-
+                var contacts = parser.RetrieveContactsFromFile(buffer);
                 var addedContacts = await appManager.AddMultipleContacts(contacts);
                 return addedContacts == null ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data in it are corrupt") : Request.CreateResponse(HttpStatusCode.OK, addedContacts);
             }
