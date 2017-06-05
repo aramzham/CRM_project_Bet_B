@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Web;
 using NLog;
 using NLog.Targets;
 
@@ -14,7 +11,7 @@ namespace CRM.WebApi.Infrastructure
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public LoggerManager()
         {
-            FileTarget loggerTarget = (FileTarget)LogManager.Configuration.FindTargetByName("file");
+            var loggerTarget = (FileTarget)LogManager.Configuration.FindTargetByName("file");
             loggerTarget.DeleteOldFileOnStartup = false;
         }
         public void LogInfo(HttpMethod request, Uri uri)
@@ -29,21 +26,21 @@ namespace CRM.WebApi.Infrastructure
         {
             Logger.Log(LogLevel.Fatal, ex, $"\nErr: {ex.Message}\nInner: {ex.InnerException?.Message}\n");
         }
-        //public string ReadData()
-        //{
-        //    var fileTarget = (FileTarget)LogManager.Configuration.FindTargetByName("file");
-        //    var logEventInfo = new LogEventInfo { TimeStamp = DateTime.Now };
-        //    string fileName = fileTarget.FileName.Render(logEventInfo);
-        //    if (!File.Exists(fileName))
-        //        File.Create($"{logEventInfo.TimeStamp}.log");
-        //    var data = File.ReadAllLines(fileName);
-        //    string path = System.Web.HttpContext.Current?.Request.MapPath("~//Templates//log.html");
-        //    var html = File.ReadAllText(path);
-        //    string res = "";
-        //    foreach (string s in data)
-        //        res += s + "</br>";
-        //    var t = html.Replace("{data}", res).Replace("{filename}", fileName);
-        //    return t;
-        //}
+        public string ReadLogData()
+        {
+            var fileTarget = (FileTarget)LogManager.Configuration.FindTargetByName("file");
+            var logEventInfo = new LogEventInfo { TimeStamp = DateTime.Now };
+            var fileName = fileTarget.FileName.Render(logEventInfo);
+            if (!File.Exists(fileName))
+                File.Create($"{logEventInfo.TimeStamp}.log");
+            var data = File.ReadAllLines(fileName);
+            var path = System.Web.HttpContext.Current?.Request.MapPath("~//Templates//logs.html");
+            var html = File.ReadAllText(path);
+            var res = "";
+            foreach (var s in data)
+                res += s + "</br>";
+            var t = html.Replace("{data}", res).Replace("{filename}", fileName);
+            return t;
+        }
     }
 }

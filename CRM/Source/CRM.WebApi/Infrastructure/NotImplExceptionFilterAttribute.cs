@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity.Core;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http.Filters;
 
 namespace CRM.WebApi.Infrastructure
 {
-    public class NotImplExceptionAttribute : ExceptionFilterAttribute
+    public class NotImplExceptionFilterAttribute : ExceptionFilterAttribute
     {
-        private readonly LoggerManager _logger = new LoggerManager();
+        //private readonly LoggerManager _logger = new LoggerManager();
         //public override Task OnExceptionAsync(HttpActionExecutedContext action, CancellationToken cancellationToken)
         //{
         //    _logger.LogError(action.Exception, action.Request.Method, action.Request.RequestUri);

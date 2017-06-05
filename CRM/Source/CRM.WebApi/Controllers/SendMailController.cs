@@ -12,6 +12,7 @@ using CRM.WebApi.Infrastructure;
 
 namespace CRM.WebApi.Controllers
 {
+    [NotImplExceptionFilter]
     public class SendMailController : ApiController
     {
         private MailManager mailManager = new MailManager();

@@ -1,12 +1,7 @@
-﻿using CRM.EntityFramework;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -18,11 +13,9 @@ using NLog;
 namespace CRM.WebApi.Controllers
 {
     //TODO: parseri mej stugel fullname, email null chlni, email-er@ valid linen
-    [NotImplException]
+    [NotImplExceptionFilter]
     public class ContactsController : ApiController
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
         private ApplicationManager appManager = new ApplicationManager();
 
         // GET: api/Contacts
@@ -87,26 +80,15 @@ namespace CRM.WebApi.Controllers
             // Check if the request contains multipart/form-data.
             if (!Request.Content.IsMimeMultipartContent()) throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
 
-            var root = HttpContext.Current.Server.MapPath("~//Templates"); 
+            var root = HttpContext.Current.Server.MapPath("~//Templates");
             var provider = new MultipartFormDataStreamProvider(root);
-            //try
-            //{
-                // Read the form data.
-                await Request.Content.ReadAsMultipartAsync(provider);
-                //foreach (var file in provider.Contents)
-                //{
+            await Request.Content.ReadAsMultipartAsync(provider);
+            var parser = new ParsingManager();
+            var buffer = File.ReadAllBytes(provider.FileData.SingleOrDefault()?.LocalFileName);
+            var contacts = parser.RetrieveContactsFromFile(buffer);
+            var addedContacts = await appManager.AddMultipleContacts(contacts);
 
-                //}
-                var parser = new ParsingManager();
-                var buffer = File.ReadAllBytes(provider.FileData.SingleOrDefault()?.LocalFileName);
-                var contacts = parser.RetrieveContactsFromFile(buffer);
-                var addedContacts = await appManager.AddMultipleContacts(contacts);
-                return addedContacts == null ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt") : Request.CreateResponse(HttpStatusCode.OK, addedContacts);
-            //}
-            //catch (System.Exception e)
-            //{
-            //    return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
-            //}
+            return addedContacts == null ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt") : addedContacts.Count == 0 ? Request.CreateErrorResponse(HttpStatusCode.Conflict, "No valid contacts were found") : Request.CreateResponse(HttpStatusCode.OK, addedContacts);
         }
 
         // DELETE: api/Contacts/guid

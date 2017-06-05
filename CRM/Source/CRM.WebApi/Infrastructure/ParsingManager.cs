@@ -5,19 +5,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
-using System.Xml.Linq;
 using CRM.WebApi.Models;
-using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using NLog;
 
 namespace CRM.WebApi.Infrastructure
 {
+    [NotImplExceptionFilter]
     public class ParsingManager
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
         private ModelFactory modelFactory = new ModelFactory();
 
         private readonly Dictionary<Extensions, string> ExtensionSignature = new Dictionary<Extensions, string>
