@@ -56,23 +56,6 @@ namespace CRM.WebApi.Infrastructure
             return contacts;
         }
 
-        //private List<Contact> RetrieveContactsFromExcel(string path)
-        //{
-        //    var excel = new ExcelQueryFactory(path);
-        //    var sheets = excel.GetWorksheetNames();
-        //    var contactsRows = (from c in excel.Worksheet<Row>(sheets.First())
-        //                        select c).ToList();
-
-        //    return contactsRows.Select(contactRow => new ContactRequestModel
-        //    {
-        //        FullName = contactRow["FullName"],
-        //        CompanyName = contactRow["CompanyName"],
-        //        Position = contactRow["Position"],
-        //        Country = contactRow["Country"],
-        //        Email = contactRow["Email"]
-        //    }).Select(x => modelFactory.CreateContact(x)).ToList();
-        //}
-
         private List<ContactRequestModel> ReadExcelFileDOM(string path)
         {
             var strProperties = new string[5];
