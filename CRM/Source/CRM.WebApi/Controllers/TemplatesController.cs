@@ -1,112 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Description;
-using CRM.EntityFramework;
 using CRM.WebApi.Infrastructure;
-using CRM.WebApi.Models;
 
 namespace CRM.WebApi.Controllers
 {
+    [NotImplExceptionFilter]
     public class TemplatesController : ApiController
     {
-        //private CRMDatabaseEntities db = new CRMDatabaseEntities();
+        private LoggerManager logger = new LoggerManager();
         private ApplicationManager appManager = new ApplicationManager();
 
         // GET: api/Templates
         public async Task<IHttpActionResult> GetTemplates()
         {
             var templates = await appManager.GetAllTemplates();
-            if (templates == null) return BadRequest("Something went wrong, call me baby");
+            if (templates == null) return BadRequest("Something went wrong, call your supporting stuff");
             else return Ok(templates);
         }
 
-        //// GET: api/Templates/5
-        //[ResponseType(typeof(Template))]
-        //public async Task<IHttpActionResult> GetTemplate(int id)
-        //{
-        //    var template = await appManager.GetTemplateById(id);
-        //    if (template == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return Ok(template);
-        //}
-
-        //// PUT: api/Templates/5
-        //[ResponseType(typeof(void))]
-        //public IHttpActionResult PutTemplate(int id, Template template)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    if (id != template.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    db.Entry(template).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        db.SaveChanges();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!TemplateExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return StatusCode(HttpStatusCode.NoContent);
-        //}
-
-        //// POST: api/Templates
-        //[ResponseType(typeof(Template))]
-        //public IHttpActionResult PostTemplate(Template template)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    db.Templates.Add(template);
-        //    db.SaveChanges();
-
-        //    return CreatedAtRoute("DefaultApi", new { id = template.Id }, template);
-        //}
-
-        //// DELETE: api/Templates/5
-        //[ResponseType(typeof(Template))]
-        //public IHttpActionResult DeleteTemplate(int id)
-        //{
-        //    Template template = db.Templates.Find(id);
-        //    if (template == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    db.Templates.Remove(template);
-        //    db.SaveChanges();
-
-        //    return Ok(template);
-        //}
-
+        //GET: api/Templates/Exceptions
+        [Route("api/Templates/Exceptions"), HttpGet]
+        public HttpResponseMessage GetLog()
+        {
+            var response = new HttpResponseMessage { Content = new StringContent(logger.ReadLogData()) };
+            response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
+            return response;
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -115,10 +36,5 @@ namespace CRM.WebApi.Controllers
             }
             base.Dispose(disposing);
         }
-
-        //private bool TemplateExists(int id)
-        //{
-        //    return db.Templates.Count(e => e.Id == id) > 0;
-        //}
     }
 }

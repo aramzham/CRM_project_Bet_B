@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using CRM.EntityFramework;
 using CRM.WebApi.Models;
 
 namespace CRM.WebApi.Infrastructure
 {
+    [NotImplExceptionFilter]
     public class ModelFactory
     {
-        private CRMDatabaseEntities db = new CRMDatabaseEntities();
         public ContactResponseModel CreateContactResponseModel(Contact c)
         {
             return new ContactResponseModel

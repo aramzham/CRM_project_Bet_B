@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.Http;
 using CRM.EntityFramework;
-using CRM.WebApi.Models;
 
 namespace CRM.WebApi.Infrastructure
 {
-    //TODO: async problem!
+    [NotImplExceptionFilter]
     public class MailManager
     {
         private CRMDatabaseEntities db = new CRMDatabaseEntities();
@@ -45,22 +42,6 @@ namespace CRM.WebApi.Infrastructure
             }
         }
 
-        //public async Task SendMailToSingleContact(Contact contact, int templateId)
-        //{
-        //    //var templateText = GetTemplate    Text(templateId).Result;
-        //    //var messageText = ReplacePlaceholders(templateText, contact);
-        //    //var messageText = await GetMessageText(templateId, contact);
-        //    var messageText = await GetMessageText(templateId, contact);
-        //    var msg = new MailMessage("aram.j90@gmail.com", contact.Email, $"Test for {contact.FullName}", messageText);
-        //    msg.IsBodyHtml = true;
-        //    var sc = new SmtpClient("smtp.gmail.com", 587);
-        //    sc.UseDefaultCredentials = false;
-        //    var netCredential = new NetworkCredential("aram.j90@gmail.com", "smtp587x");
-        //    sc.Credentials = netCredential;
-        //    sc.EnableSsl = true;
-        //    sc.Send(msg);
-        //}
-
         public async Task SendMailToSingleContact(Contact contact, int templateId)
         {
             var messageText = await GetMessageText(templateId, contact);
@@ -71,10 +52,8 @@ namespace CRM.WebApi.Infrastructure
         }
 
         private async Task<string> GetMessageText(int templateId, Contact contact)
-        //private string GetMessageText(int templateId, Contact contact)
         {
             var template = await db.Templates.FindAsync(templateId);
-            //var template = db.Templates.Find(templateId);
             var path = HttpContext.Current?.Request.MapPath(template?.PathToFile);
             var templateText = File.ReadAllText(path);
             return
