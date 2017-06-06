@@ -83,18 +83,18 @@ namespace CRM.WebApi.Controllers
         [Route("api/Contacts/upload"), HttpPost]
         public async Task<HttpResponseMessage> PostFormData()
         {
-            // Check if the request contains multipart/form-data.
             if (!Request.Content.IsMimeMultipartContent()) throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
 
             var root = HttpContext.Current.Server.MapPath("~//Templates");
             var provider = new MultipartFormDataStreamProvider(root);
             await Request.Content.ReadAsMultipartAsync(provider);
+
             var parser = new ParsingManager();
             var buffer = File.ReadAllBytes(provider.FileData.SingleOrDefault()?.LocalFileName);
             var contacts = parser.RetrieveContactsFromFile(buffer);
-            var addedContacts = await appManager.AddMultipleContacts(contacts);
+            var success = await appManager.AddMultipleContacts(contacts);
 
-            return addedContacts == null ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt") : Request.CreateResponse(HttpStatusCode.OK, $"Affected: {addedContacts.Count(x => x != null)} contacts,\nFailed: {addedContacts.Count(x => x == null)}");
+            return success == false ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt") : Request.CreateResponse(HttpStatusCode.OK, $"Affected: {contacts.Count(x => x != null)} contacts,\nFailed: {contacts.Count(x => x == null)}");
         }
 
         //POST: api/Contacts/query

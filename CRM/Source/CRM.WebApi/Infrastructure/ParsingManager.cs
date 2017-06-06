@@ -24,9 +24,9 @@ namespace CRM.WebApi.Infrastructure
             {Extensions.Xls, "D0-CF-11-E0-A1-B1-1A-E1"}
         };
 
-        public List<Contact> RetrieveContactsFromFile(byte[] bytes)
+        public List<ContactRequestModel> RetrieveContactsFromFile(byte[] bytes)
         {
-            var contacts = new List<Contact>();
+            List<ContactRequestModel> contacts;
             Extensions currentExtension = GetExtension(bytes);
             var path = HttpContext.Current?.Request.MapPath($"~//Templates//file.{currentExtension}");
 
@@ -73,12 +73,11 @@ namespace CRM.WebApi.Infrastructure
         //    }).Select(x => modelFactory.CreateContact(x)).ToList();
         //}
 
-        private List<Contact> ReadExcelFileDOM(string path)
+        private List<ContactRequestModel> ReadExcelFileDOM(string path)
         {
-            int successCount = 0, failedCound = 0;
             var strProperties = new string[5];
             var contactRequestModels = new List<ContactRequestModel>();
-            ContactRequestModel model = null;
+            ContactRequestModel model;
             var j = 0;
             using (var myDoc = SpreadsheetDocument.Open(path, false))
             {
@@ -113,20 +112,16 @@ namespace CRM.WebApi.Infrastructure
                     }
                     j = 0;
                     i = i + 1;
-                    if (strProperties.Any(string.IsNullOrEmpty))
-                    {
-                        failedCound++;
-                        continue;
-                    }
                     model = new ContactRequestModel { FullName = strProperties[0], CompanyName = strProperties[1], Position = strProperties[2], Country = strProperties[3], Email = strProperties[4] };
-                    if (strProperties.Any(x => string.IsNullOrEmpty(x) || x.Length < 2) || !new EmailAddressAttribute().IsValid(strProperties[4])) contactRequestModels.Add(null);
+                    if (strProperties.Any(x => string.IsNullOrEmpty(x)) || !new EmailAddressAttribute().IsValid(strProperties[4])) contactRequestModels.Add(null);
                     else contactRequestModels.Add(model);
                 }
-                return contactRequestModels.Select(x => modelFactory.CreateContact(x)).ToList();
+                //return contactRequestModels.Select(x => modelFactory.CreateContact(x)).ToList();
+                return contactRequestModels;
             }
         }
 
-        private List<Contact> RetrieveContactsFromCsv(string path)
+        private List<ContactRequestModel> RetrieveContactsFromCsv(string path)
         {
             var contacts = new List<ContactRequestModel>();
             string[] lines;
@@ -147,7 +142,6 @@ namespace CRM.WebApi.Infrastructure
                 {
                     if (string.IsNullOrEmpty(lines[i])) continue;
                     var currentLine = lines[i].Split(',');
-                    if (currentLine.Any(string.IsNullOrEmpty)) continue;
                     var contact = new ContactRequestModel
                     {
                         FullName = currentLine[fullNameIndex],
@@ -156,9 +150,11 @@ namespace CRM.WebApi.Infrastructure
                         Country = currentLine[countryIndex],
                         Email = currentLine[emailIndex]
                     };
+                    if (currentLine.Any(string.IsNullOrEmpty) || !new EmailAddressAttribute().IsValid(currentLine[emailIndex])) contact = null;
                     contacts.Add(contact);
                 }
-                return contacts.Select(x => modelFactory.CreateContact(x)).ToList();
+                //return contacts.Select(x => modelFactory.CreateContact(x)).ToList();
+                return contacts;
             }
             catch (Exception)
             {

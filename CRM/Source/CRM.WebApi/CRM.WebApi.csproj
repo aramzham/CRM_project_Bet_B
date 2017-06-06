@@ -146,9 +146,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Templates\ArmyDay.html" />
-    <Content Include="Templates\Christmas.html" />
     <Content Include="Templates\logs.html" />
     <Content Include="Templates\NewYear.html" />
+    <Content Include="Templates\ProductOffer.txt" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
