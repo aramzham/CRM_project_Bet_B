@@ -141,6 +141,38 @@ namespace CRM.WebApi.Infrastructure
         {
             return await db.Contacts.Select(x => x.Email).ToListAsync();
         }
+
+        public async Task<bool> ResetForDemo()
+        {
+            var addedTestContacts = new List<ContactResponseModel>();
+            try
+            {
+                await db.Database.ExecuteSqlCommandAsync("delete from Contacts");
+                await db.Database.ExecuteSqlCommandAsync("delete from MailingLists");
+                await db.SaveChangesAsync();
+                var test1 = new ContactRequestModel { FullName = "Aram Zhamkochyan", CompanyName = "BetConstruct", Position = "Intern", Country = "Armenia", Email = "aram532@yandex.ru" };
+                var test2 = new ContactRequestModel { FullName = "Lusine Khachatryan", CompanyName = "BetConstruct", Position = "Intern", Country = "Armenia", Email = "luskhachatryann@gmail.com" };
+                var test3 = new ContactRequestModel { FullName = "Sargis Chilingaryan", CompanyName = "BetConstruct", Position = "Front-end developer", Country = "Armenia", Email = "sargis.chilingaryann@gmail.com" };
+                var test4 = new ContactRequestModel { FullName = "Davit Hunanyan", CompanyName = "STDev", Position = "Frontend developer", Country = "Armenia", Email = "0777dav@gmail.com" };
+                var test5 = new ContactRequestModel { FullName = "Vahan Kalenteryan", CompanyName = "BetConstruct", Position = "Front-end developer", Country = "Armenia", Email = "vahan.kalenteryan@gmail.com" };
+                foreach (var testContact in new[] { test1, test2, test3, test4, test5 })
+                {
+                    addedTestContacts.Add(await AddContact(testContact));
+                }
+
+                var testMailingList = await AddMailingList("OurGroup");
+                var guids = addedTestContacts.Select(x => x.Guid.ToString()).ToArray();
+                var ml = await AddContactsToMailingLists(testMailingList.MailingListId, guids);
+                if (ml == null) return false;
+                await db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         #endregion
         #region Mailing lists methods
         public async Task<List<MailingListResponseModel>> GetAllMailingLists()

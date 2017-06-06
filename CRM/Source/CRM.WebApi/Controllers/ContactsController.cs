@@ -36,6 +36,15 @@ namespace CRM.WebApi.Controllers
             return Ok(contact);
         }
 
+        //GET: api/Contacts/demo
+        [ResponseType(typeof (void)), Route("api/Contacts/demo"), HttpGet]
+        public async Task<IHttpActionResult> GetDemo()
+        {
+            if (await appManager.ResetForDemo()) return Ok("Ready for demo!");
+            else return BadRequest("Oops! Something went wrong");
+        }
+
+
         //// GET: api/Contacts/?start=1&numberOfRows=2&ascending=false
         //[ResponseType(typeof(Contact))]
         //public async Task<IHttpActionResult> GetContact(int start, int numberOfRows, bool ascending)
@@ -91,6 +100,16 @@ namespace CRM.WebApi.Controllers
             return addedContacts == null ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt") : addedContacts.Count == 0 ? Request.CreateErrorResponse(HttpStatusCode.Conflict, "No valid contacts were found") : Request.CreateResponse(HttpStatusCode.OK, addedContacts);
         }
 
+        //POST: api/Contacts/query
+        [ResponseType(typeof (ContactResponseModel)), Route("api/Contacts/query"), HttpPost]
+        public async Task<IHttpActionResult> Query(QueryRequestModel qrm)
+        {
+            var queryResult = await appManager.Query(qrm);
+            if (queryResult == null) return BadRequest("Invalid query");
+            if (queryResult.Count == 0) return Ok("Your query didn't produce anything");
+            return Ok(queryResult);
+        }
+
         // DELETE: api/Contacts/guid
         [ResponseType(typeof(ContactResponseModel))]
         public async Task<IHttpActionResult> DeleteContact(string guid)
@@ -109,13 +128,5 @@ namespace CRM.WebApi.Controllers
             else return Ok(contacts);
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                appManager.Dispose();
-            }
-            base.Dispose(disposing);
-        }
     }
 }
