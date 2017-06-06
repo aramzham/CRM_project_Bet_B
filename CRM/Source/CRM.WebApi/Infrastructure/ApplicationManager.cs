@@ -76,21 +76,21 @@ namespace CRM.WebApi.Infrastructure
             return modelFactory.CreateContactResponseModel(contactToAdd);
         }
 
-        public async Task<List<ContactResponseModel>> AddMultipleContacts(List<Contact> contacts)
+        public async Task<bool> AddMultipleContacts(List<ContactRequestModel> contacts)
         {
             using (var transaction = db.Database.BeginTransaction())
             {
                 try
                 {
-                    db.Contacts.AddRange(contacts);
+                    db.Contacts.AddRange(contacts.Select(x => modelFactory.CreateContact(x)));
                     await db.SaveChangesAsync();
                     transaction.Commit();
-                    return contacts.Select(x => modelFactory.CreateContactResponseModel(x)).ToList();
+                    return true;
                 }
                 catch (Exception)
                 {
                     transaction.Rollback();
-                    return null;
+                    return false;
                 }
             }
         }
