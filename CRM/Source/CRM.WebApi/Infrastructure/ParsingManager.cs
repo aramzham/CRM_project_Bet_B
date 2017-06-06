@@ -1,6 +1,7 @@
 ﻿using CRM.EntityFramework;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -74,6 +75,7 @@ namespace CRM.WebApi.Infrastructure
 
         private List<Contact> ReadExcelFileDOM(string path)
         {
+            int successCount = 0, failedCound = 0;
             var strProperties = new string[5];
             var contactRequestModels = new List<ContactRequestModel>();
             ContactRequestModel model = null;
@@ -111,9 +113,14 @@ namespace CRM.WebApi.Infrastructure
                     }
                     j = 0;
                     i = i + 1;
-                    if (strProperties.Any(string.IsNullOrEmpty)) continue;
+                    if (strProperties.Any(string.IsNullOrEmpty))
+                    {
+                        failedCound++;
+                        continue;
+                    }
                     model = new ContactRequestModel { FullName = strProperties[0], CompanyName = strProperties[1], Position = strProperties[2], Country = strProperties[3], Email = strProperties[4] };
-                    contactRequestModels.Add(model);
+                    if (strProperties.Any(x => string.IsNullOrEmpty(x) || x.Length < 2) || !new EmailAddressAttribute().IsValid(strProperties[4])) contactRequestModels.Add(null);
+                    else contactRequestModels.Add(model);
                 }
                 return contactRequestModels.Select(x => modelFactory.CreateContact(x)).ToList();
             }

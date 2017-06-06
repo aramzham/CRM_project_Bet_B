@@ -32,11 +32,11 @@ namespace CRM.WebApi.Infrastructure
             return contact == null ? null : modelFactory.CreateContactResponseModel(contact);
         }
 
-        public async Task<List<Contact>> GetByPage(int start, int numberOfRows, bool @ascending)
-        {
-            if (ascending) return await db.Contacts.OrderBy(x => x.ID).Skip(start - 1).Take(numberOfRows).ToListAsync();
-            else return await db.Contacts.OrderByDescending(x => x.ID).Skip(start - 1).Take(numberOfRows).ToListAsync();
-        }
+        //public async Task<List<Contact>> GetByPage(int start, int numberOfRows, bool @ascending)
+        //{
+        //    if (ascending) return await db.Contacts.OrderBy(x => x.ID).Skip(start - 1).Take(numberOfRows).ToListAsync();
+        //    else return await db.Contacts.OrderByDescending(x => x.ID).Skip(start - 1).Take(numberOfRows).ToListAsync();
+        //}
 
         public async Task<bool> UpdateContact(string guid, ContactRequestModel contact)
         {
@@ -171,6 +171,43 @@ namespace CRM.WebApi.Infrastructure
             {
                 return false;
             }
+        }
+
+        public async Task<List<ContactResponseModel>> Query(string[] sorts, QueryRequestModel qrm)
+        {
+            //var queryString = "select * from Contacts";
+            //var propertyValues = new[] { qrm.FullName, qrm.CompanyName, qrm.Position, qrm.Country, qrm.Email };
+            //var properties = qrm.GetType().GetProperties();
+
+            //if (propertyValues.Any(x => !string.IsNullOrEmpty(x))) //where
+            //{
+            //    queryString += " where ";
+            //    for (int i = 0; i < properties.Length; i++)
+            //    {
+            //        if (!string.IsNullOrEmpty(propertyValues[i])) queryString += $"{properties[i].Name} like '{propertyValues[i]}' and ";
+            //    }
+            //    queryString = queryString.Substring(0, queryString.Length - 5); //removes last "and "
+            //}
+            var fullName = !string.IsNullOrEmpty(qrm.FullName) ? qrm.FullName : "%";
+            var companyName = !string.IsNullOrEmpty(qrm.CompanyName) ? qrm.CompanyName : "%";
+            var position = !string.IsNullOrEmpty(qrm.Position) ? qrm.Position : "%";
+            var country = !string.IsNullOrEmpty(qrm.Country) ? qrm.Country : "%";
+            var email = !string.IsNullOrEmpty(qrm.Email) ? qrm.Email : "%";
+            var queryString = "select * from Contacts " +
+                              $"where fullname like '{fullName}' " +
+                              $"and companyname like '{companyName}' " +
+                              $"and position like '{position}' " +
+                              $"and country like '{country}' " +
+                              $"and email like '{email}'";
+
+            if (sorts != null && sorts.Length != 0) // order by
+            {
+                queryString += " order by ";
+                queryString = sorts.Aggregate(queryString, (current, sort) => current + $"{sort.Replace('_', ' ')},");
+                queryString = queryString.TrimEnd(',');
+            }
+            var rows = await db.Contacts.SqlQuery(queryString).ToListAsync();
+            return rows.Select(x => modelFactory.CreateContactResponseModel(x)).ToList();
         }
 
         #endregion

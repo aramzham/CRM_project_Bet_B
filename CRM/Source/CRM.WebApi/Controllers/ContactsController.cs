@@ -8,7 +8,6 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using CRM.WebApi.Infrastructure;
 using CRM.WebApi.Models;
-using NLog;
 
 namespace CRM.WebApi.Controllers
 {
@@ -37,7 +36,7 @@ namespace CRM.WebApi.Controllers
         }
 
         //GET: api/Contacts/demo
-        [ResponseType(typeof (void)), Route("api/Contacts/demo"), HttpGet]
+        [ResponseType(typeof(void)), Route("api/Contacts/demo"), HttpGet]
         public async Task<IHttpActionResult> GetDemo()
         {
             if (await appManager.ResetForDemo()) return Ok("Ready for demo!");
@@ -61,8 +60,6 @@ namespace CRM.WebApi.Controllers
         public async Task<IHttpActionResult> PutContact(string guid, [FromBody]ContactRequestModel contact)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            //if (contact.Guid == null || guid != contact.Guid.ToString()) return BadRequest();
 
             if (!await appManager.UpdateContact(guid, contact)) return BadRequest("Contact not found or specified email already exists");
             else return StatusCode(HttpStatusCode.NoContent);
@@ -97,14 +94,14 @@ namespace CRM.WebApi.Controllers
             var contacts = parser.RetrieveContactsFromFile(buffer);
             var addedContacts = await appManager.AddMultipleContacts(contacts);
 
-            return addedContacts == null ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt") : addedContacts.Count == 0 ? Request.CreateErrorResponse(HttpStatusCode.Conflict, "No valid contacts were found") : Request.CreateResponse(HttpStatusCode.OK, addedContacts);
+            return addedContacts == null ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt") : Request.CreateResponse(HttpStatusCode.OK, $"Affected: {addedContacts.Count(x => x != null)} contacts,\nFailed: {addedContacts.Count(x => x == null)}");
         }
 
         //POST: api/Contacts/query
-        [ResponseType(typeof (ContactResponseModel)), Route("api/Contacts/query"), HttpPost]
-        public async Task<IHttpActionResult> Query(QueryRequestModel qrm)
+        [ResponseType(typeof(ContactResponseModel)), Route("api/Contacts/query"), HttpPost]
+        public async Task<IHttpActionResult> Query([FromUri]string[] sort, [FromBody] QueryRequestModel filter)
         {
-            var queryResult = await appManager.Query(qrm);
+            var queryResult = await appManager.Query(sort, filter);
             if (queryResult == null) return BadRequest("Invalid query");
             if (queryResult.Count == 0) return Ok("Your query didn't produce anything");
             return Ok(queryResult);

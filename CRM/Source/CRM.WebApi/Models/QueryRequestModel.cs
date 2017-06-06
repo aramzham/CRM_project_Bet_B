@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace CRM.WebApi.Models
+﻿namespace CRM.WebApi.Models
 {
     public class QueryRequestModel
     {
-        public Dictionary<string, string> FullName { get; set; }
-        public Dictionary<string, string> CompanyName { get; set; }
-        public Dictionary<string, string> Position { get; set; }
-        public Dictionary<string, string> Country { get; set; }
-        public Dictionary<string, string> Email { get; set; }
+        public string FullName { get; set; }
+        public string CompanyName { get; set; }
+        public string Position { get; set; }
+        public string Country { get; set; }
+        public string Email { get; set; }
     }
 }
