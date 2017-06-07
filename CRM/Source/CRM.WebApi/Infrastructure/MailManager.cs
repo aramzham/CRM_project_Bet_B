@@ -10,7 +10,6 @@ using CRM.EntityFramework;
 
 namespace CRM.WebApi.Infrastructure
 {
-    [NotImplExceptionFilter]
     public class MailManager
     {
         private CRMDatabaseEntities db = new CRMDatabaseEntities();

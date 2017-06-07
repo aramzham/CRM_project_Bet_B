@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -11,7 +12,6 @@ using CRM.WebApi.Models;
 
 namespace CRM.WebApi.Controllers
 {
-    //TODO: parseri mej stugel fullname, email null chlni, email-er@ valid linen
     [NotImplExceptionFilter]
     public class ContactsController : ApiController
     {
@@ -94,7 +94,7 @@ namespace CRM.WebApi.Controllers
             var contacts = parser.RetrieveContactsFromFile(buffer);
             var success = await appManager.AddMultipleContacts(contacts);
 
-            return success == false ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt") : Request.CreateResponse(HttpStatusCode.OK, $"Affected: {contacts.Count(x => x != null)} contacts,\nFailed: {contacts.Count(x => x == null)}");
+            return success == false ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt") : Request.CreateResponse(HttpStatusCode.OK, $"Affected: {contacts.Count(x => x != null)} contacts, Failed: {contacts.Count(x => x == null)}");
         }
 
         //POST: api/Contacts/query

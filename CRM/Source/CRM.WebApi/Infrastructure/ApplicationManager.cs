@@ -82,7 +82,7 @@ namespace CRM.WebApi.Infrastructure
             {
                 try
                 {
-                    db.Contacts.AddRange(contacts.Select(x => modelFactory.CreateContact(x)));
+                    db.Contacts.AddRange(contacts.Where(x => x != null).Select(x => modelFactory.CreateContact(x)));
                     await db.SaveChangesAsync();
                     transaction.Commit();
                     return true;

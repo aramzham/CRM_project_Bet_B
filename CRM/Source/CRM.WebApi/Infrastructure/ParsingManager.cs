@@ -12,7 +12,6 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace CRM.WebApi.Infrastructure
 {
-    [NotImplExceptionFilter]
     public class ParsingManager
     {
         private ModelFactory modelFactory = new ModelFactory();
