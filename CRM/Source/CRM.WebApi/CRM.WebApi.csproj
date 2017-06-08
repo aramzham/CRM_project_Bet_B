@@ -152,10 +152,21 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="build\B.png" />
+    <Content Include="build\index.html" />
+    <Content Include="build\service-worker.js" />
+    <Content Include="build\static\css\main.3645b30b.css" />
+    <Content Include="build\static\js\main.08fb3204.js" />
+    <Content Include="build\static\media\pencil.f5e3c303.png" />
     <Content Include="packages.config" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="build\asset-manifest.json" />
+    <Content Include="build\manifest.json" />
+    <Content Include="build\static\css\main.3645b30b.css.map" />
+    <Content Include="build\static\js\main.08fb3204.js.map" />
+    <Content Include="build\static\media\Quicksand-Regular.f87b9b4f.ttf" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>

@@ -16,15 +16,8 @@ namespace CRM.WebApi.Infrastructure
         #region Contacts methods
         public async Task<List<ContactResponseModel>> GetAllContacts()
         {
-            try
-            {
-                var listOfContacts = await db.Contacts.ToListAsync();
-                return listOfContacts.Select(modelFactory.CreateContactResponseModel).ToList();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            var listOfContacts = await db.Contacts.ToListAsync();
+            return listOfContacts?.Select(modelFactory.CreateContactResponseModel).ToList();
         }
         public async Task<ContactResponseModel> GetContactByGuid(string guid)
         {
@@ -60,7 +53,7 @@ namespace CRM.WebApi.Infrastructure
             {
                 await db.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch
             {
                 if (!await ContactExists(guid)) return false;
                 else throw;
@@ -87,7 +80,7 @@ namespace CRM.WebApi.Infrastructure
                     transaction.Commit();
                     return true;
                 }
-                catch (Exception)
+                catch
                 {
                     transaction.Rollback();
                     return false;
@@ -124,7 +117,7 @@ namespace CRM.WebApi.Infrastructure
                     transaction.Commit();
                     return listOfRemovedContacts;
                 }
-                catch (Exception)
+                catch
                 {
                     transaction.Rollback();
                     return null;
@@ -167,7 +160,7 @@ namespace CRM.WebApi.Infrastructure
                 await db.SaveChangesAsync();
                 return true;
             }
-            catch (Exception)
+            catch
             {
                 return false;
             }
@@ -175,19 +168,6 @@ namespace CRM.WebApi.Infrastructure
 
         public async Task<List<ContactResponseModel>> Query(string[] sorts, QueryRequestModel qrm)
         {
-            //var queryString = "select * from Contacts";
-            //var propertyValues = new[] { qrm.FullName, qrm.CompanyName, qrm.Position, qrm.Country, qrm.Email };
-            //var properties = qrm.GetType().GetProperties();
-
-            //if (propertyValues.Any(x => !string.IsNullOrEmpty(x))) //where
-            //{
-            //    queryString += " where ";
-            //    for (int i = 0; i < properties.Length; i++)
-            //    {
-            //        if (!string.IsNullOrEmpty(propertyValues[i])) queryString += $"{properties[i].Name} like '{propertyValues[i]}' and ";
-            //    }
-            //    queryString = queryString.Substring(0, queryString.Length - 5); //removes last "and "
-            //}
             var fullName = !string.IsNullOrEmpty(qrm.FullName) ? qrm.FullName : "%";
             var companyName = !string.IsNullOrEmpty(qrm.CompanyName) ? qrm.CompanyName : "%";
             var position = !string.IsNullOrEmpty(qrm.Position) ? qrm.Position : "%";

@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Linq;
-using System.Net.Http.Formatting;
 using System.Web.Http;
 using CRM.WebApi.Infrastructure;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
-using Newtonsoft.Json.Serialization;
 using Owin;
 
 [assembly: OwinStartup(typeof(CRM.WebApi.Startup))]
@@ -18,7 +15,7 @@ namespace CRM.WebApi
         {
             ConfigureOAuth(app);
 
-            app.UseWelcomePage("/");
+            // app.UseWelcomePage("/");
 
             var httpConfig = new HttpConfiguration();
 
@@ -55,7 +52,6 @@ namespace CRM.WebApi
             // Token Generation
             app.UseOAuthAuthorizationServer(OAuthServerOptions);
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions());
-
         }
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Web.Http;
 using CRM.WebApi.Infrastructure;
 using CRM.WebApi.Models.AuthModels;
@@ -26,21 +21,13 @@ namespace CRM.WebApi.Controllers
         [Route("Register")]
         public async Task<IHttpActionResult> Register(UserModel userModel)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             IdentityResult result = await _aum.RegisterUser(userModel);
 
             IHttpActionResult errorResult = GetErrorResult(result);
 
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            return Ok();
+            return errorResult ?? Ok();
         }
 
         protected override void Dispose(bool disposing)
@@ -55,10 +42,7 @@ namespace CRM.WebApi.Controllers
 
         private IHttpActionResult GetErrorResult(IdentityResult result)
         {
-            if (result == null)
-            {
-                return InternalServerError();
-            }
+            if (result == null) return InternalServerError();
 
             if (!result.Succeeded)
             {
@@ -70,17 +54,12 @@ namespace CRM.WebApi.Controllers
                     }
                 }
 
-                if (ModelState.IsValid)
-                {
-                    // No ModelState errors are available to send, so just return an empty BadRequest.
-                    return BadRequest();
-                }
+                // No ModelState errors are available to send, so just return an empty BadRequest.
+                if (ModelState.IsValid) return BadRequest();
 
                 return BadRequest(ModelState);
             }
-
             return null;
         }
     }
-
 }
