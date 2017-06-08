@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http;
+using CRM.WebApi.Infrastructure;
 using Microsoft.Owin;
+using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Serialization;
 using Owin;
 
@@ -13,9 +16,11 @@ namespace CRM.WebApi
     {
         public void Configuration(IAppBuilder app)
         {
-            //app.UseWelcomePage("/");
+            ConfigureOAuth(app);
 
-            HttpConfiguration httpConfig = new HttpConfiguration();
+            app.UseWelcomePage("/");
+
+            var httpConfig = new HttpConfiguration();
 
             ConfigureWebApi(httpConfig);
 
@@ -36,6 +41,21 @@ namespace CRM.WebApi
 
             //var jsonFormatter = config.Formatters.OfType<JsonMediaTypeFormatter>().First();
             //jsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+        }
+        public void ConfigureOAuth(IAppBuilder app)
+        {
+            var OAuthServerOptions = new OAuthAuthorizationServerOptions()
+            {
+                AllowInsecureHttp = true,
+                TokenEndpointPath = new PathString("/token"),
+                AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
+                Provider = new SimpleAuthorizationServerProvider()
+            };
+
+            // Token Generation
+            app.UseOAuthAuthorizationServer(OAuthServerOptions);
+            app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions());
+
         }
     }
 }

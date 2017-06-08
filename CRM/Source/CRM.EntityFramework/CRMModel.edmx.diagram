@@ -7,8 +7,10 @@
       <Diagram DiagramId="e392e99dc42d425c96de4b423ef9c220" Name="Diagram1">
         <EntityTypeShape EntityType="CRMDatabaseModel.Contact" Width="1.5" PointX="0.875" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="CRMDatabaseModel.MailingList" Width="1.5" PointX="3" PointY="1.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="CRMDatabaseModel.Template" Width="1.5" PointX="5.875" PointY="1.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="CRMDatabaseModel.Template" Width="1.5" PointX="5.25" PointY="0.5" IsExpanded="true" />
         <AssociationConnector Association="CRMDatabaseModel.ContactsMailingLists" ManuallyRouted="false" />
+      </Diagram>
+      <Diagram DiagramId="7b992fb80bc5422fbf78dc3bd0fb96c1" Name="Diagram2" >
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

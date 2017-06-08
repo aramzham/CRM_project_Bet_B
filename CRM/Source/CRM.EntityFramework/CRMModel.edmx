@@ -131,8 +131,8 @@
             <End Role="Contacts" EntitySet="Contacts" />
             <End Role="MailingLists" EntitySet="MailingLists" />
           </AssociationSet>
-        </EntityContainer>
-      </Schema>
+          </EntityContainer>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -178,7 +178,7 @@
               <ScalarProperty Name="ID" ColumnName="MailingListID" />
             </EndProperty>
           </AssociationSetMapping>
-        </EntityContainerMapping>
+          </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
   </edmx:Runtime>
