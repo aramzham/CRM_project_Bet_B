@@ -1,6 +1,6 @@
 <h1>BetConstruct internship project</h1>
 <hr height="10px"/>
-<p>A very simple CRM system, back-end of which is written in C#, that consists of 3 major parts:</p>
+<p>A very simple CRM system that consists of 3 major parts back-end of which is written in C#:</p>
 <ol type="a">
   <li><a href="https://github.com/aramzham/CRM_project_Bet_b/tree/master/CRM/Source/CRM.Database">SQL Database</a></li>
   <li><a href="https://github.com/aramzham/CRM_project_Bet_b/tree/master/CRM/Source/CRM.EntityFramework">Entity Framework</a></li>
