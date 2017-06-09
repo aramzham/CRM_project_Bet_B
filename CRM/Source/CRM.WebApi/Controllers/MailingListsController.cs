@@ -6,6 +6,7 @@ using System.Web.Http.Description;
 using CRM.EntityFramework;
 using CRM.WebApi.Infrastructure;
 using CRM.WebApi.Models;
+using CRM.WebApi.Infrastructure.ApplicationManagers;
 
 namespace CRM.WebApi.Controllers
 {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using CRM.EntityFramework;
 using CRM.WebApi.Models;
 
-namespace CRM.WebApi.Infrastructure
+namespace CRM.WebApi.Infrastructure.ApplicationManagers
 {
     public class ApplicationManager : IDisposable
     {
@@ -91,7 +91,6 @@ namespace CRM.WebApi.Infrastructure
         public async Task<ContactResponseModel> RemoveContact(string guid)
         {
             var contact = await db.Contacts.Where(x => x.Guid.ToString() == guid).FirstOrDefaultAsync();
-
             if (contact == null) return null;
 
             db.Contacts.Remove(contact);
@@ -137,7 +136,9 @@ namespace CRM.WebApi.Infrastructure
 
         public async Task<bool> ResetForDemo()
         {
-            var addedTestContacts = new List<ContactResponseModel>();
+            var group1 = new List<ContactResponseModel>();
+            var group2 = new List<ContactResponseModel>();
+            var group3 = new List<ContactResponseModel>();
             try
             {
                 await db.Database.ExecuteSqlCommandAsync("delete from Contacts");
@@ -145,18 +146,31 @@ namespace CRM.WebApi.Infrastructure
                 await db.SaveChangesAsync();
                 var test1 = new ContactRequestModel { FullName = "Aram Zhamkochyan", CompanyName = "BetConstruct", Position = "Intern", Country = "Armenia", Email = "aram532@yandex.ru" };
                 var test2 = new ContactRequestModel { FullName = "Lusine Khachatryan", CompanyName = "BetConstruct", Position = "Intern", Country = "Armenia", Email = "luskhachatryann@gmail.com" };
-                var test3 = new ContactRequestModel { FullName = "Sargis Chilingaryan", CompanyName = "BetConstruct", Position = "Front-end developer", Country = "Armenia", Email = "sargis.chilingaryann@gmail.com" };
+                var test3 = new ContactRequestModel { FullName = "Sargis Chilingaryan", CompanyName = "BetConstruct", Position = "Front-end developer", Country = "Armenia", Email = "1995saqo@mail.ru" };
                 var test4 = new ContactRequestModel { FullName = "Davit Hunanyan", CompanyName = "STDev", Position = "Frontend developer", Country = "Armenia", Email = "0777dav@gmail.com" };
                 var test5 = new ContactRequestModel { FullName = "Vahan Kalenteryan", CompanyName = "BetConstruct", Position = "Front-end developer", Country = "Armenia", Email = "vahan.kalenteryan@gmail.com" };
-                foreach (var testContact in new[] { test1, test2, test3, test4, test5 })
-                {
-                    addedTestContacts.Add(await AddContact(testContact));
-                }
+                var test6 = new ContactRequestModel { FullName = "Gayane Khachatryan", CompanyName = "BetConstruct", Position = "Back-end developer", Country = "Armenia", Email = "gayane.jane@gmail.com" };
+                var test7 = new ContactRequestModel { FullName = "Narek Yegoryan", CompanyName = "BetContstruct", Position = "Back-end developer", Country = "Armenia", Email = "yegoryan.narek@gmail.com" };
+                var test8 = new ContactRequestModel { FullName = "Aghasi Lorsabyan", CompanyName = "TUMO", Position = "Trainer", Country = "Kharabakh", Email = "lorsabyan@gmail.com" };
+                var test9 = new ContactRequestModel { FullName = "Khachatur Sukiasyan", CompanyName = "SIL Group", Position = "Owner", Country = "Armenia", Email = "khachatur125@gmail.com" };
+                var test10 = new ContactRequestModel { FullName = "Meri Sahakyan", CompanyName = "BetConstruct", Position = "Intern", Country = "Armenia", Email = "sahakyan_m@bk.ru" };
+                var test11 = new ContactRequestModel { FullName = "Van Hakobyan", CompanyName = "BetConstruct", Position = "Intern", Country = "Armenia", Email = "vanhakobyan1996@gmail.com" };
+                var test12 = new ContactRequestModel { FullName = "Hovhanes Nalbandyan", CompanyName = "BetConstruct", Position = "Developer", Country = "Armenia", Email = "nalbandyan.1991@bk.ru" };
+                var test13 = new ContactRequestModel { FullName = "Lusine Hovsepyan", CompanyName = "MIC Armenia", Position = "Developer", Country = "Armenia", Email = "lusine@hovsepyan.am" };
+                foreach (var testContact in new[] { test1, test2, test4, test5, test6 })
+                    group1.Add(await AddContact(testContact));
+                foreach (var testContact in new[] { test3, test7, test10, test11, test12, test13 })
+                    group2.Add(await AddContact(testContact));
+                foreach (var testContact in new[] { test8, test9 })
+                    group3.Add(await AddContact(testContact));
 
-                var testMailingList = await AddMailingList("OurGroup");
-                var guids = addedTestContacts.Select(x => x.Guid.ToString()).ToArray();
-                var ml = await AddContactsToMailingLists(testMailingList.MailingListId, guids);
-                if (ml == null) return false;
+                var testMailingList1 = await AddMailingList("OurGroup");
+                var testMailingList2 = await AddMailingList("MIC Armenia");
+                var testMailingList3 = await AddMailingList("VIP");
+                var ml1 = await AddContactsToMailingLists(testMailingList1.MailingListId, group1.Select(x => x.Guid.ToString()).ToArray());
+                var ml2 = await AddContactsToMailingLists(testMailingList2.MailingListId, group2.Select(x => x.Guid.ToString()).ToArray());
+                var ml3 = await AddContactsToMailingLists(testMailingList3.MailingListId, group3.Select(x => x.Guid.ToString()).ToArray());
+                if (ml1 == null || ml2 == null || ml3 == null) return false;
                 await db.SaveChangesAsync();
                 return true;
             }
@@ -195,7 +209,7 @@ namespace CRM.WebApi.Infrastructure
         public async Task<List<MailingListResponseModel>> GetAllMailingLists()
         {
             var mailingLists = await db.MailingLists.ToListAsync();
-            return mailingLists.Select(x => modelFactory.CreateMailingListResponseModel(x)).ToList();
+            return mailingLists?.Select(x => modelFactory.CreateMailingListResponseModel(x)).ToList();
         }
 
         public async Task<MailingListResponseModel> GetMailingListById(int id)
@@ -311,6 +325,7 @@ namespace CRM.WebApi.Infrastructure
         public async Task<MailingListResponseModel> RemoveMailingList(int id)
         {
             var mailingList = await db.MailingLists.FindAsync(id);
+            if (mailingList == null) return null;
 
             db.MailingLists.Remove(mailingList);
             await db.SaveChangesAsync();
@@ -336,7 +351,7 @@ namespace CRM.WebApi.Infrastructure
                     transaction.Commit();
                     return listOfRemovedLists;
                 }
-                catch (Exception)
+                catch
                 {
                     transaction.Rollback();
                     return null;

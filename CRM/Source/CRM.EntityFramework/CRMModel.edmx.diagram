@@ -5,10 +5,18 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="e392e99dc42d425c96de4b423ef9c220" Name="Diagram1">
-        <EntityTypeShape EntityType="CRMDatabaseModel.Contact" Width="1.5" PointX="0.875" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="CRMDatabaseModel.MailingList" Width="1.5" PointX="3" PointY="1.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="CRMDatabaseModel.Template" Width="1.5" PointX="5.25" PointY="0.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="CRMDatabaseModel.Contact" Width="1.5" PointX="7.75" PointY="6" IsExpanded="true" />
+        <EntityTypeShape EntityType="CRMDatabaseModel.MailingList" Width="1.5" PointX="10.125" PointY="6.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="CRMDatabaseModel.Template" Width="1.5" PointX="10" PointY="4.75" IsExpanded="true" />
         <AssociationConnector Association="CRMDatabaseModel.ContactsMailingLists" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="CRMDatabaseModel.C__MigrationHistory" Width="1.5" PointX="0.75" PointY="5.125" />
+        <EntityTypeShape EntityType="CRMDatabaseModel.AspNetRole" Width="1.5" PointX="0.75" PointY="7.375" />
+        <EntityTypeShape EntityType="CRMDatabaseModel.AspNetUserClaim" Width="1.5" PointX="5.25" PointY="7.625" />
+        <EntityTypeShape EntityType="CRMDatabaseModel.AspNetUserLogin" Width="1.5" PointX="5.25" PointY="5" />
+        <EntityTypeShape EntityType="CRMDatabaseModel.AspNetUser" Width="1.5" PointX="3" PointY="5.375" />
+        <AssociationConnector Association="CRMDatabaseModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" />
+        <AssociationConnector Association="CRMDatabaseModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" />
+        <AssociationConnector Association="CRMDatabaseModel.AspNetUserRoles" />
       </Diagram>
       <Diagram DiagramId="7b992fb80bc5422fbf78dc3bd0fb96c1" Name="Diagram2" >
       </Diagram>

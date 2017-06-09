@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
 using CRM.WebApi.Infrastructure;
+using CRM.WebApi.Infrastructure.ApplicationManagers;
 
 namespace CRM.WebApi.Controllers
 {

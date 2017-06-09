@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
 using CRM.WebApi.Infrastructure;
+using CRM.WebApi.Infrastructure.ApplicationManagers;
 using CRM.WebApi.Models;
 
 namespace CRM.WebApi.Controllers
@@ -94,7 +95,7 @@ namespace CRM.WebApi.Controllers
             var contacts = parser.RetrieveContactsFromFile(buffer);
             var success = await appManager.AddMultipleContacts(contacts);
 
-            return success == false ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt") : Request.CreateResponse(HttpStatusCode.OK, $"Affected: {contacts.Count(x => x != null)} contacts, Failed: {contacts.Count(x => x == null)}");
+            return success == false || contacts.TrueForAll(x => x == null) ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt") : Request.CreateResponse(HttpStatusCode.OK, $"Affected: {contacts.Count(x => x != null)} contacts, Failed: {contacts.Count(x => x == null)}");
         }
 
         //POST: api/Contacts/query

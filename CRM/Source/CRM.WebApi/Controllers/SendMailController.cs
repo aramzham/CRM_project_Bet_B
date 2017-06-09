@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Mail;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Web.Http;
-using CRM.EntityFramework;
 using CRM.WebApi.Infrastructure;
+using CRM.WebApi.Infrastructure.ApplicationManagers;
 
 namespace CRM.WebApi.Controllers
 {
