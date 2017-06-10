@@ -4,7 +4,7 @@ using CRM.WebApi.Models.AuthModels;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 
-namespace CRM.WebApi.Infrastructure
+namespace CRM.WebApi.Infrastructure.ApplicationManagers
 {
 
     public class AuthUserManager : IDisposable

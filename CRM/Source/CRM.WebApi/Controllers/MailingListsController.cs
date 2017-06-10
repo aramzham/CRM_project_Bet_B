@@ -37,8 +37,6 @@ namespace CRM.WebApi.Controllers
         [ResponseType(typeof(void)), Route("api/MailingLists/add/{id}"), HttpPut]
         public async Task<HttpResponseMessage> AddContactsIntoMailingList(int id, [FromBody]string[] guids)
         {
-            if (!ModelState.IsValid) return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
-
             var mailingListResponseModel = await appManager.AddContactsToMailingLists(id, guids);
             return mailingListResponseModel == null ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Input data was invalid") : Request.CreateResponse(HttpStatusCode.NoContent, mailingListResponseModel);
         }
@@ -47,15 +45,13 @@ namespace CRM.WebApi.Controllers
         [ResponseType(typeof(MailingListResponseModel)), Route("api/MailingLists/remove/{id}"), HttpPut]
         public async Task<IHttpActionResult> RemoveContactsFromMailingList(int id, [FromBody]string[] guids)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
             var mailingListResponseModel = await appManager.RemoveContactsFromMailingList(id, guids);
             if (mailingListResponseModel != null) return Ok(mailingListResponseModel);
             else return BadRequest("Invalid input data");
         }
 
         // PUT: api/MailingLists/rename/id
-        [ResponseType(typeof (MailingListResponseModel)), Route("api/MailingLists/rename/{id}"), HttpPut]
+        [ResponseType(typeof(MailingListResponseModel)), Route("api/MailingLists/rename/{id}"), HttpPut]
         public async Task<IHttpActionResult> RenameMailingList(int id, [FromBody] string name)
         {
             if (string.IsNullOrEmpty(name)) return BadRequest("Please specify a valid name");
@@ -68,10 +64,7 @@ namespace CRM.WebApi.Controllers
         [ResponseType(typeof(MailingListResponseModel)),Route("api/MailingLists", Name = "CreateEmptyMailingList"), HttpPost]
         public async Task<IHttpActionResult> CreateNewMailingList([FromUri]string mailingListName)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
             var mailingList = await appManager.AddMailingList(mailingListName);
-
             return CreatedAtRoute("CreateEmptyMailingList", new { id = mailingList.MailingListId }, mailingList);
         }
 
@@ -79,8 +72,6 @@ namespace CRM.WebApi.Controllers
         [ResponseType(typeof(MailingListResponseModel)), Route("api/MailingLists/new", Name = "CreateNewMailingList"), HttpPost]
         public async Task<IHttpActionResult> CreateMailingListFromContactsList([FromUri]string name, [FromBody]string[] guids)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
             var mailingList = await appManager.AddMailingList(name);
             var mailingListResponseModel = await appManager.AddContactsToMailingLists(mailingList.MailingListId, guids);
             if (mailingListResponseModel == null) return BadRequest("Error: Invalid input data");

@@ -1,5 +1,4 @@
-﻿using CRM.EntityFramework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -10,12 +9,10 @@ using CRM.WebApi.Models;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 
-namespace CRM.WebApi.Infrastructure
+namespace CRM.WebApi.Infrastructure.ApplicationManagers
 {
     public class ParsingManager
     {
-        private ModelFactory modelFactory = new ModelFactory();
-
         private readonly Dictionary<Extensions, string> ExtensionSignature = new Dictionary<Extensions, string>
         {
             {Extensions.CSV, "66-69-6C-65-2C-66-6F-72"},
@@ -95,10 +92,9 @@ namespace CRM.WebApi.Infrastructure
                     j = 0;
                     i = i + 1;
                     model = new ContactRequestModel { FullName = strProperties[0], CompanyName = strProperties[1], Position = strProperties[2], Country = strProperties[3], Email = strProperties[4] };
-                    if (strProperties.Any(x => string.IsNullOrEmpty(x)) || !new EmailAddressAttribute().IsValid(strProperties[4])) contactRequestModels.Add(null);
+                    if (strProperties.Any(string.IsNullOrEmpty) || !new EmailAddressAttribute().IsValid(strProperties[4])) contactRequestModels.Add(null);
                     else contactRequestModels.Add(model);
                 }
-                //return contactRequestModels.Select(x => modelFactory.CreateContact(x)).ToList();
                 return contactRequestModels;
             }
         }
@@ -135,10 +131,9 @@ namespace CRM.WebApi.Infrastructure
                     if (currentLine.Any(string.IsNullOrEmpty) || !new EmailAddressAttribute().IsValid(currentLine[emailIndex])) contact = null;
                     contacts.Add(contact);
                 }
-                //return contacts.Select(x => modelFactory.CreateContact(x)).ToList();
                 return contacts;
             }
-            catch (Exception)
+            catch
             {
                 return null;
             }

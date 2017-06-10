@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -37,14 +38,16 @@ namespace CRM.WebApi.Controllers
         }
 
         //GET: api/Contacts/demo
-        [ResponseType(typeof(void)), Route("api/Contacts/demo"), HttpGet]
-        public async Task<IHttpActionResult> GetDemo()
+        [ResponseType(typeof(void)), Route("api/Contacts/reset"), HttpGet]
+        public async Task<HttpResponseMessage> GetDemo()
         {
-            if (await appManager.ResetForDemo()) return Ok("Ready for demo!");
-            else return BadRequest("Oops! Something went wrong");
+            var content = await appManager.ResetForDemo();
+            if (content == null) return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Oops! Something went wrong");
+            var response = new HttpResponseMessage { Content = new StringContent(content) };
+            response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
+            return response;
         }
-
-
+        
         //// GET: api/Contacts/?start=1&numberOfRows=2&ascending=false
         //[ResponseType(typeof(Contact))]
         //public async Task<IHttpActionResult> GetContact(int start, int numberOfRows, bool ascending)
@@ -114,7 +117,7 @@ namespace CRM.WebApi.Controllers
         {
             var contact = await appManager.RemoveContact(guid);
             if (contact == null) return NotFound();
-            else return Ok(contact);
+            return Ok(contact);
         }
 
         // DELETE: api/Contacts
@@ -123,8 +126,7 @@ namespace CRM.WebApi.Controllers
         {
             var contacts = await appManager.RemoveContactByGroup(guids);
             if (contacts == null) return BadRequest("One or more guids were corrupt");
-            else return Ok(contacts);
+            return Ok(contacts);
         }
-
     }
 }

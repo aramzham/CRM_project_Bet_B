@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using CRM.EntityFramework;
 using CRM.WebApi.Models;
 
@@ -90,6 +92,7 @@ namespace CRM.WebApi.Infrastructure.ApplicationManagers
 
         public async Task<ContactResponseModel> RemoveContact(string guid)
         {
+            if (string.IsNullOrEmpty(guid)) return null;
             var contact = await db.Contacts.Where(x => x.Guid.ToString() == guid).FirstOrDefaultAsync();
             if (contact == null) return null;
 
@@ -134,7 +137,7 @@ namespace CRM.WebApi.Infrastructure.ApplicationManagers
             return await db.Contacts.Select(x => x.Email).ToListAsync();
         }
 
-        public async Task<bool> ResetForDemo()
+        public async Task<string> ResetForDemo()
         {
             var group1 = new List<ContactResponseModel>();
             var group2 = new List<ContactResponseModel>();
@@ -157,11 +160,12 @@ namespace CRM.WebApi.Infrastructure.ApplicationManagers
                 var test11 = new ContactRequestModel { FullName = "Van Hakobyan", CompanyName = "BetConstruct", Position = "Intern", Country = "Armenia", Email = "vanhakobyan1996@gmail.com" };
                 var test12 = new ContactRequestModel { FullName = "Hovhanes Nalbandyan", CompanyName = "BetConstruct", Position = "Developer", Country = "Armenia", Email = "nalbandyan.1991@bk.ru" };
                 var test13 = new ContactRequestModel { FullName = "Lusine Hovsepyan", CompanyName = "MIC Armenia", Position = "Developer", Country = "Armenia", Email = "lusine@hovsepyan.am" };
+                var test14 = new ContactRequestModel { FullName = "Tsovinar Ghazaryan", CompanyName = "MIC Armenia", Position = "Back-end developer", Country = "Armenia", Email = "tsovinar.ghazaryan@yahoo.com" };
                 foreach (var testContact in new[] { test1, test2, test4, test5, test6 })
                     group1.Add(await AddContact(testContact));
                 foreach (var testContact in new[] { test3, test7, test10, test11, test12, test13 })
                     group2.Add(await AddContact(testContact));
-                foreach (var testContact in new[] { test8, test9 })
+                foreach (var testContact in new[] { test8, test9, test14 })
                     group3.Add(await AddContact(testContact));
 
                 var testMailingList1 = await AddMailingList("OurGroup");
@@ -170,13 +174,14 @@ namespace CRM.WebApi.Infrastructure.ApplicationManagers
                 var ml1 = await AddContactsToMailingLists(testMailingList1.MailingListId, group1.Select(x => x.Guid.ToString()).ToArray());
                 var ml2 = await AddContactsToMailingLists(testMailingList2.MailingListId, group2.Select(x => x.Guid.ToString()).ToArray());
                 var ml3 = await AddContactsToMailingLists(testMailingList3.MailingListId, group3.Select(x => x.Guid.ToString()).ToArray());
-                if (ml1 == null || ml2 == null || ml3 == null) return false;
+                if (ml1 == null || ml2 == null || ml3 == null) return null;
                 await db.SaveChangesAsync();
-                return true;
+                var path = HttpContext.Current?.Request.MapPath("~//Templates//Demo page.html");
+                return File.ReadAllText(path);
             }
             catch
             {
-                return false;
+                return null;
             }
         }
 

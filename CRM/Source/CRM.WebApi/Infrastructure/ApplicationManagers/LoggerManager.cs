@@ -4,7 +4,7 @@ using System.Net.Http;
 using NLog;
 using NLog.Targets;
 
-namespace CRM.WebApi.Infrastructure
+namespace CRM.WebApi.Infrastructure.ApplicationManagers
 {
     public class LoggerManager
     {

@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using System.Web;
 using CRM.EntityFramework;
 
-namespace CRM.WebApi.Infrastructure
+namespace CRM.WebApi.Infrastructure.ApplicationManagers
 {
-    public class MailManager
+    public class MailManager : IDisposable
     {
         private CRMDatabaseEntities db = new CRMDatabaseEntities();
 
@@ -76,6 +76,11 @@ namespace CRM.WebApi.Infrastructure
                 }
             }
             return recipients;
+        }
+
+        public void Dispose()
+        {
+            db.Dispose();
         }
     }
 }

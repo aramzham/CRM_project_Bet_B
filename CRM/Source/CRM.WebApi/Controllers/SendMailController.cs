@@ -12,8 +12,7 @@ namespace CRM.WebApi.Controllers
         private ApplicationManager appManager = new ApplicationManager();
 
         // POST: api/SendMail
-        [HttpPost]
-        [Route("api/SendMail/{templateId}")]
+        [Route("api/SendMail/{templateId}"), HttpPost]
         public async Task<IHttpActionResult> Post([FromBody] string[] guids, int templateId)
         {
             if (!await appManager.TemplateExists(templateId)) return BadRequest("Template doesn't exist");
