@@ -47,7 +47,7 @@ namespace CRM.WebApi.Controllers
             response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
             return response;
         }
-        
+
         //// GET: api/Contacts/?start=1&numberOfRows=2&ascending=false
         //[ResponseType(typeof(Contact))]
         //public async Task<IHttpActionResult> GetContact(int start, int numberOfRows, bool ascending)
@@ -85,7 +85,7 @@ namespace CRM.WebApi.Controllers
 
         //POST: api/Contacts/upload
         [Route("api/Contacts/upload"), HttpPost]
-        public async Task<HttpResponseMessage> PostFormData()
+        public async Task<IHttpActionResult> PostFormData()
         {
             if (!Request.Content.IsMimeMultipartContent()) throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
 
@@ -98,7 +98,9 @@ namespace CRM.WebApi.Controllers
             var contacts = parser.RetrieveContactsFromFile(buffer);
             var success = await appManager.AddMultipleContacts(contacts);
 
-            return success == false || contacts.TrueForAll(x => x == null) ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt") : Request.CreateResponse(HttpStatusCode.OK, $"Affected: {contacts.Count(x => x != null)} contacts, Failed: {contacts.Count(x => x == null)}");
+            //return success == false || contacts.TrueForAll(x => x == null) ? Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt") : Request.CreateResponse(HttpStatusCode.OK, $"Added: {contacts.Count(x => x != null)} contacts, Failed: {contacts.Count(x => x == null) - 1}");
+            if (success == false || contacts.TrueForAll(x => x == null)) return BadRequest("File or data is corrupt");
+            return Ok($"Added: {contacts.Count(x => x != null)} contacts, Failed: {contacts.Count(x => x == null) - 1}");
         }
 
         //POST: api/Contacts/query
