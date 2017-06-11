@@ -24,6 +24,7 @@ namespace CRM.WebApi.Infrastructure.ApplicationManagers
         {
             List<ContactRequestModel> contacts;
             Extensions currentExtension = GetExtension(bytes);
+            if (ExtensionSignature.Any(x => x.Key != currentExtension)) return null;
             var path = HttpContext.Current?.Request.MapPath($"~//Templates//file.{currentExtension}");
 
             try
@@ -32,7 +33,7 @@ namespace CRM.WebApi.Infrastructure.ApplicationManagers
 
                 File.WriteAllBytes(path, bytes);
 
-                contacts = currentExtension == Extensions.CSV ? RetrieveContactsFromCsv(path) : ReadExcelFileDOM(path);
+                contacts = currentExtension == Extensions.CSV ? RetrieveContactsFromCsv(path) : ReadExcelFile(path);
             }
             catch (Exception ex)
             {
@@ -52,7 +53,7 @@ namespace CRM.WebApi.Infrastructure.ApplicationManagers
             return contacts;
         }
 
-        private List<ContactRequestModel> ReadExcelFileDOM(string path)
+        private List<ContactRequestModel> ReadExcelFile(string path)
         {
             var strProperties = new string[5];
             var contactRequestModels = new List<ContactRequestModel>();
@@ -67,32 +68,35 @@ namespace CRM.WebApi.Infrastructure.ApplicationManagers
                 var sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
                 var i = 1;
                 string value;
+                var emailValidator = new EmailAddressAttribute();
                 foreach (var r in sheetData.Elements<Row>())
                 {
-                    if (i != 1)
+                    foreach (var c in r.Elements<Cell>())
                     {
-                        foreach (var c in r.Elements<Cell>())
-                        {
-                            if (c == null) continue;
+                        if (c == null) continue;
 
-                            value = c.InnerText;
-                            if (c.DataType != null)
+                        value = c.InnerText;
+                        if (c.DataType != null)
+                        {
+                            var stringTable = workbookPart.GetPartsOfType<SharedStringTablePart>().FirstOrDefault();
+                            if (stringTable != null)
                             {
-                                var stringTable = workbookPart.GetPartsOfType<SharedStringTablePart>().FirstOrDefault();
-                                if (stringTable != null)
-                                {
-                                    value = stringTable.SharedStringTable.
-                                      ElementAt(int.Parse(value)).InnerText;
-                                }
+                                value = stringTable.SharedStringTable.
+                                  ElementAt(int.Parse(value)).InnerText;
                             }
-                            strProperties[j] = value;
-                            j = j + 1;
                         }
+                        strProperties[j] = value;
+                        j = j + 1;
                     }
+                    if (i == 1 &&
+                        (strProperties[0] != "FullName" || strProperties[1] != "CompanyName" ||
+                         strProperties[2] != "Position" || strProperties[3] != "Country" || strProperties[4] != "Email"))
+                        return null;
                     j = 0;
                     i = i + 1;
+                    if (i == 2) continue;
                     model = new ContactRequestModel { FullName = strProperties[0], CompanyName = strProperties[1], Position = strProperties[2], Country = strProperties[3], Email = strProperties[4] };
-                    if (strProperties.Any(string.IsNullOrEmpty) || !new EmailAddressAttribute().IsValid(strProperties[4])) contactRequestModels.Add(null);
+                    if (strProperties.Any(string.IsNullOrEmpty) || !emailValidator.IsValid(strProperties[4])) contactRequestModels.Add(null);
                     else contactRequestModels.Add(model);
                 }
                 return contactRequestModels;
