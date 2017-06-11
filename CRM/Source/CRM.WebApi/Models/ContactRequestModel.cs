@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 
 namespace CRM.WebApi.Models
 {
     public class ContactRequestModel
     {
-        //RegularExpression("/^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u") for international names
         [Required(ErrorMessage = "Full name is required"), StringLength(200, MinimumLength = 1, ErrorMessage = "The full name must be specified.")]
         public string FullName { get; set; }
         [Required(ErrorMessage = "Company name is required"), StringLength(150, MinimumLength = 1, ErrorMessage = "The company name must be specified.")]

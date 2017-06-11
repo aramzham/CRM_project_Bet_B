@@ -96,11 +96,10 @@ namespace CRM.WebApi.Controllers
             var parser = new ParsingManager();
             var buffer = File.ReadAllBytes(provider.FileData.SingleOrDefault()?.LocalFileName);
             var contacts = parser.RetrieveContactsFromFile(buffer);
-            if (contacts == null) return BadRequest(message: "Invalid file");
             var success = await appManager.AddMultipleContacts(contacts);
 
-            if (success == false || contacts.TrueForAll(x => x == null)) return BadRequest(message: "File or data is corrupt");
-            return Ok($"Added: {contacts.Count(x => x != null)} contact(s), Failed: {contacts.Count(x => x == null)}");
+            if (success == false || contacts.TrueForAll(x => x == null)) return ResponseMessage(Request.CreateErrorResponse(HttpStatusCode.BadRequest, "File or data is corrupt"));
+            return ResponseMessage(Request.CreateResponse(HttpStatusCode.OK, $"Added: {contacts.Count(x => x != null)}, Failed: {contacts.Count(x => x == null)}"));
         }
 
         //POST: api/Contacts/query

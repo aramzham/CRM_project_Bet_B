@@ -154,8 +154,9 @@
   <ItemGroup>
     <Content Include="build\index.html" />
     <Content Include="build\service-worker.js" />
-    <Content Include="build\static\css\main.352672b3.css" />
-    <Content Include="build\static\js\main.641af740.js" />
+    <Content Include="build\static\css\main.3a52bed0.css" />
+    <Content Include="build\static\js\main.b10681f0.js" />
+    <Content Include="build\static\media\B.png" />
     <Content Include="build\static\media\pencil.f5e3c303.png" />
     <Content Include="packages.config" />
     <Content Include="NLog.config">
@@ -163,8 +164,8 @@
     </Content>
     <Content Include="build\asset-manifest.json" />
     <Content Include="build\manifest.json" />
-    <Content Include="build\static\css\main.352672b3.css.map" />
-    <Content Include="build\static\js\main.641af740.js.map" />
+    <Content Include="build\static\css\main.3a52bed0.css.map" />
+    <Content Include="build\static\js\main.b10681f0.js.map" />
     <Content Include="build\static\media\Quicksand-Regular.f87b9b4f.ttf" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>

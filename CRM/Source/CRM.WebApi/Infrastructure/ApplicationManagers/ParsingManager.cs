@@ -15,7 +15,7 @@ namespace CRM.WebApi.Infrastructure.ApplicationManagers
     {
         private readonly Dictionary<Extensions, string> ExtensionSignature = new Dictionary<Extensions, string>
         {
-            {Extensions.CSV, "66-69-6C-65-2C-66-6F-72"},
+            {Extensions.Csv, "66-69-6C-65-2C-66-6F-72"},
             {Extensions.Xlsx, "50-4B-03-04-14-00-06-00"},
             {Extensions.Xls, "D0-CF-11-E0-A1-B1-1A-E1"}
         };
@@ -24,7 +24,6 @@ namespace CRM.WebApi.Infrastructure.ApplicationManagers
         {
             List<ContactRequestModel> contacts;
             Extensions currentExtension = GetExtension(bytes);
-            if (ExtensionSignature.Any(x => x.Key != currentExtension)) return null;
             var path = HttpContext.Current?.Request.MapPath($"~//Templates//file.{currentExtension}");
 
             try
@@ -33,11 +32,7 @@ namespace CRM.WebApi.Infrastructure.ApplicationManagers
 
                 File.WriteAllBytes(path, bytes);
 
-                contacts = currentExtension == Extensions.CSV ? RetrieveContactsFromCsv(path) : ReadExcelFile(path);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
+                contacts = currentExtension == Extensions.Csv ? RetrieveContactsFromCsv(path) : ReadExcelFile(path);
             }
             finally
             {
@@ -145,7 +140,7 @@ namespace CRM.WebApi.Infrastructure.ApplicationManagers
 
         private enum Extensions
         {
-            CSV,
+            Csv,
             Xlsx,
             Xls
         }
@@ -161,17 +156,19 @@ namespace CRM.WebApi.Infrastructure.ApplicationManagers
 
             switch (extension)
             {
-                case Extensions.CSV:
+                case Extensions.Csv:
+                    return extension;
+                case Extensions.Xls:
                     return extension;
                 case Extensions.Xlsx:
                     string fileBody = Encoding.UTF8.GetString(bytes);
                     if (fileBody.Contains("xl"))
                         return extension;
                     break;
-                case Extensions.Xls:
-                    return extension;
+                default:
+                    throw new FormatException("The format of uploaded file was incorrect. Only .Csv and .Xlsx supported files are allowed.");
             }
-            throw new FormatException("The format of uploaded file was incorrect. Only .csv and MS Excel supported files are allowed.");
+            throw new Exception("Oops! Something went wrong!");
         }
     }
 }
