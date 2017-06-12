@@ -26,7 +26,6 @@ namespace CRM.WebApi.Controllers
             return Ok(contacts);
         }
 
-        [Authorize]
         // GET: api/Contacts?Guid=guid
         [ResponseType(typeof(ContactResponseModel))]
         public async Task<IHttpActionResult> GetContactByGuid([FromUri]string guid)
