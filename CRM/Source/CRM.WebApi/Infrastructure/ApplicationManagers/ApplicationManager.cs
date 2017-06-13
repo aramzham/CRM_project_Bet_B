@@ -102,7 +102,7 @@ namespace CRM.WebApi.Infrastructure.ApplicationManagers
             return modelFactory.CreateContactResponseModel(contact);
         }
 
-        public async Task<List<ContactResponseModel>> RemoveContactByGroup(string[] guids)
+        public async Task<List<ContactResponseModel>> RemoveContactsByGroup(string[] guids)
         {
             using (var transaction = db.Database.BeginTransaction())
             {

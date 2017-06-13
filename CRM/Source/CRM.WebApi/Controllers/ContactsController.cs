@@ -124,7 +124,7 @@ namespace CRM.WebApi.Controllers
         [ResponseType(typeof(ContactResponseModel))]
         public async Task<IHttpActionResult> DeleteContactByGroup([FromBody]string[] guids)
         {
-            var contacts = await appManager.RemoveContactByGroup(guids);
+            var contacts = await appManager.RemoveContactsByGroup(guids);
             if (contacts == null) return BadRequest("One or more guids were corrupt");
             return Ok(contacts);
         }
